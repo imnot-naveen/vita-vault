@@ -1,0 +1,13 @@
+requests
+loguru
+beautifulsoup4
+playwright
+python-dotenv
+tqdm
+pandas
+sentence-transformers
+qdrant-client
+fastapi
+uvicorn
+streamlit
+openai          # used as the SDK only — the LLM itself comes from OpenRouter

@@ -1,0 +1,71 @@
+# ── Python ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+.mypy_cache/
+.pytype/
+.pyre/
+
+# ── Virtual environments ───────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# ── Secrets / local config ─────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Generated Reddit ingestor output ───────────────────────────────
+# Scraped data + SQLite DB + logs are produced at runtime, not committed.
+yars-preview/reddit_ingestor/output/
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Logs ───────────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+*.out
+*.err
+
+# ── Data / runtime artifacts ───────────────────────────────────────
+data/raw/
+data/clean/
+data/chunks/
+qdrant_storage/
+.dist/
+
+# ── Test / tooling caches ──────────────────────────────────────────
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.coverage.*
+coverage.xml
+
+# ── IDEs / editors ─────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
