@@ -12,7 +12,7 @@ LLM_BASE_URL = "https://openrouter.ai/api/v1"
 LLM_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 
-SUBREDDITS = ["vitahacks", "PSVita", "vitahomebrew", "VitaPiracy"]
+SUBREDDITS = ["vitahacks", "PSVita", "vitahomebrew", "VitaPiracy", "vita"]
 # Reference only — the ingestor keeps its own SUBREDDITS list in
 # reddit_ingestor/config.py (plus POST_LIMIT / MAX_COMMENTS knobs). Keep both in sync.
 
