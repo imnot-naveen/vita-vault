@@ -24,7 +24,7 @@ GITHUB_REPOS = [
 ]
 
 FORUM_SEED_URLS = [
-    # fill in with real thread URLs you find by searching
+    # fill in with real thread URLs you find by searching.
     # "https://gbatemp.net/threads/example-thread.123456/",
 ]
 
