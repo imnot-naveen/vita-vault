@@ -1,0 +1,48 @@
+[
+  {
+    "id": "free-space",
+    "question": "Why do VitaShell and PKGj show different amounts of free space after a download?",
+    "expected_any_urls": [
+      "https://github.com/TheOfficialFloW/VitaShell/issues/408"
+    ],
+    "review_note": "This source explains used versus free space; it does not establish a GPU-crash repair."
+  },
+  {
+    "id": "gpu-report",
+    "question": "GPU crash pkgj and vitashell freespace differs",
+    "expected_any_urls": [
+      "https://github.com/TheOfficialFloW/VitaShell/issues/408"
+    ],
+    "review_note": "Near-title lookup sanity check, not an independent paraphrase or proof of a fix."
+  },
+  {
+    "id": "pkgj-refresh",
+    "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+    "expected_any_urls": [
+      "https://github.com/blastrock/pkgj/issues/457",
+      "https://github.com/blastrock/pkgj/issues/458",
+      "https://github.com/blastrock/pkgj/issues/351"
+    ],
+    "review_note": "Review the reported circumstances; an exact error match alone does not validate a remedy. Development label correction after inspecting baseline: issue 351 also directly reports this error while refreshing; original expected URLs remain retained in the baseline report."
+  },
+  {
+    "id": "pstV-triangle",
+    "question": "VitaShell crashes when I press triangle on PS TV firmware 3.73.",
+    "expected_any_urls": [
+      "https://github.com/TheOfficialFloW/VitaShell/issues/552"
+    ],
+    "review_note": "Known source lookup; a reported fix needs its version and circumstances preserved."
+  },
+  {
+    "id": "personal-gpu",
+    "question": "My PS Vita 1000 3G on 3.65 Enso has GPU driver crashes in several native games. Crashes recur sooner after immediate restart and later after being powered off. I tested the microSD and three adapters. Is there a confirmed fix for my exact setup?",
+    "expected_any_urls": [],
+    "review_note": "Inspect related reports. Do not infer an exact diagnosis or confirmed repair from rank."
+  },
+  {
+    "id": "unrelated",
+    "question": "How do I bake a sourdough loaf in a Dutch oven?",
+    "expected_any_urls": [],
+    "review_note": "Negative relevance control: neighbors can still be returned; candidate output must remain unassessed, never an answer."
+  }
+]
