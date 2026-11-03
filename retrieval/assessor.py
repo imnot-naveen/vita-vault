@@ -6,7 +6,7 @@ import math
 from retrieval.evidence import decide_evidence, passage_hash
 
 
-PROMPT_VERSION = 'vita-evidence-v2'
+PROMPT_VERSION = 'vita-evidence-v3'
 FUNCTION_NAME = 'review_passages'
 ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 ROW_FIELDS = {'source_index', 'relevance', 'applicability', 'support', 'claim',
@@ -26,6 +26,8 @@ something works; guidance for troubleshooting checks or what to do;
 reported_remedy for whether anyone reported success; confirmed_fix only when
 the user explicitly asks for a confirmed/verified fix for their exact situation.
 Do not turn ordinary requests for help into demands for independent confirmation.
+A request for a precise release/version number is not a request for a confirmed
+fix. Do not choose confirmed_fix merely because the question is specific.
 
 relevance: direct when the passage addresses the requested question or scoped
 claim; related for similar symptoms, a different operation/error/version, or
@@ -43,6 +45,16 @@ free-space display is not a GPU-crash fix even if both appear in the title.
 A different error code or trigger does not establish the requested remedy.
 A fixing commit does not identify an installable release unless stated.
 reported_success is a scoped self-report, never a guaranteed repair.
+reported_success requires an explicit observation that a change was performed
+and the problem improved/resolved during a stated test or use. "Should work",
+"try this", "might help", recommendations and predictions are NOT successful
+outcomes. A passage admitting no confirmation must not receive reported_success,
+even if its setup/error matches exactly. Use suggestion_without_outcome instead.
+Failures, recurrences and withdrawals are not reported_success either: classify
+them as symptoms_only or explanation as appropriate, and flag material conflicts
+against the earlier claimed outcome. A negative finding about a remedy is not
+itself a successful remedy. If both suggestion and an actual outcome exist,
+quote the observed outcome itself and preserve the surrounding limitations.
 symptoms_only means the passage describes relevant symptoms but establishes no
 explanation, guidance or successful remedy for the requested claim.
 
@@ -226,16 +238,15 @@ def assess_evidence(retrieval, client):
     except AssessorUnavailable as exc:
         return {'status': 'service_error', 'review': None, 'model_called': True,
                 'decision': {'status': 'service_error', 'message': str(exc), 'permitted_claims': []}}
+    usage = response.get('usage') if isinstance(response, dict) else None
+    usage = {k: v for k, v in usage.items() if k in ('prompt_tokens', 'completion_tokens', 'total_tokens', 'cost')
+             and type(v) in (int, float) and math.isfinite(v)} if isinstance(usage, dict) else {}
+    metadata = {'model': getattr(client, 'model', None), 'prompt_version': PROMPT_VERSION, 'usage': usage}
     try:
         review, decision = parse_review(retrieval, response)
     except (ValueError, TypeError, KeyError, RecursionError):
-        return {'status': 'review_required', 'review': None, 'model_called': True,
+        return {**metadata, 'status': 'review_required', 'review': None, 'model_called': True,
                 'decision': {'status': 'review_required',
                              'message': 'Model output failed validation; evidence remains unassessed.',
                              'permitted_claims': []}}
-    usage = response.get('usage')
-    usage = {k: v for k, v in usage.items() if k in ('prompt_tokens', 'completion_tokens', 'total_tokens', 'cost')
-             and type(v) in (int, float) and math.isfinite(v)} if isinstance(usage, dict) else {}
-    return {'status': 'assessed', 'review': review, 'decision': decision,
-            'model_called': True, 'model': getattr(client, 'model', None),
-            'prompt_version': PROMPT_VERSION, 'usage': usage}
+    return {**metadata, 'status': 'assessed', 'review': review, 'decision': decision, 'model_called': True}

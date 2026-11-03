@@ -1,6 +1,7 @@
 """Conservative decisions over supplied passage reviews; no semantic assessor."""
 
 import hashlib
+import re
 
 
 ALLOWED_SUPPORT = {
@@ -14,6 +15,10 @@ SUPPORT = {'explanation', 'documented_guidance', 'reported_success',
            'suggestion_without_outcome', 'symptoms_only', 'none'}
 NOTICE = ('This decision enforces supplied reviews. It does not independently '
           'verify their meaning, source reliability, or a repair outcome.')
+# Narrow English-language checks for observed failure modes, not an entailment
+# classifier. Mixed quotes may require a narrower outcome quote or manual review.
+TENTATIVE_OUTCOME = re.compile(r'\b(?:should|might|may|could|would)\s+(?:\w+\s+){0,2}(?:work|help|fix|solve|resolve)\b', re.I)
+WITHDRAWN_OUTCOME = re.compile(r'\b(?:withdraw|withdrawn|retract|retracted)\b|\bproblem\s+persists\b|\b(?:crashed|failed)\s+again\b', re.I)
 
 
 def passage_hash(text):
@@ -124,6 +129,11 @@ def decide_evidence(retrieval, review):
             if support in {'explanation', 'documented_guidance', 'reported_success'}:
                 if not _text(claim) or not _text(quote) or quote not in payload['chunk']:
                     raise ValueError('Positive support needs a scoped claim and a verbatim passage quote.')
+            if support == 'reported_success':
+                if TENTATIVE_OUTCOME.search(quote):
+                    raise ValueError('A tentative prediction in a success quote requires review; it is not an observed outcome.')
+                if not assessment['contradicted'] and WITHDRAWN_OUTCOME.search(quote):
+                    raise ValueError('A withdrawn or recurring outcome cannot be labeled uncontradicted success.')
             if relevance == 'irrelevant':
                 if support != 'none' or applicability != 'not_applicable' or claim.strip():
                     raise ValueError('Irrelevant passages cannot carry a supported claim.')

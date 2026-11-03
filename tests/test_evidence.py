@@ -65,6 +65,27 @@ class EvidenceTests(unittest.TestCase):
         self.review['requested_support'] = 'confirmed_fix'
         self.assertEqual(self.decide()['status'], 'related_reports_insufficient_support')
 
+    def test_tentative_success_and_unflagged_retractions_require_review(self):
+        self.review['requested_support'] = 'reported_remedy'
+        self.assessment['support'] = 'reported_success'
+        for quote in ['Only updating the CA certificates should work.',
+                      'I withdraw my earlier statement that it fixed the issue; the problem persists.',
+                      'The menu crashed again after fifteen minutes.']:
+            with self.subTest(quote=quote):
+                self.source['payload']['chunk'] = quote
+                self.assessment.update(evidence_quote=quote, passage_sha256=passage_hash(quote))
+                result = self.decide()
+                self.assertEqual(result['status'], 'review_required')
+                self.assertEqual(result['permitted_claims'], [])
+
+    def test_explicit_observed_success_still_can_be_reported(self):
+        quote = 'I tried the change, and it worked for me during the test.'
+        self.source['payload']['chunk'] = quote
+        self.assessment.update(support='reported_success', evidence_quote=quote,
+                               passage_sha256=passage_hash(quote))
+        self.review['requested_support'] = 'reported_remedy'
+        self.assertEqual(self.decide()['status'], 'supported_answer')
+
     def test_conflicting_report_blocks_answer_permission(self):
         second = deepcopy(self.source)
         second['point_id'] = 2

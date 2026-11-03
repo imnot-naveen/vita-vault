@@ -112,6 +112,16 @@ class AssessorTests(unittest.TestCase):
         self.assertFalse(request['provider']['allow_fallbacks'])
         self.assertEqual(request['provider']['max_price'], {'prompt': 0, 'completion': 0, 'request': 0})
 
+    def test_failed_validation_keeps_usage_and_prompt_provenance(self):
+        response = self.response()
+        response['choices'][0]['finish_reason'] = 'length'
+        result = assess_evidence(self.retrieval, FakeClient(response))
+        self.assertEqual(result['status'], 'review_required')
+        self.assertEqual(result['usage']['cost'], 0)
+        self.assertEqual(result['usage']['completion_tokens'], 50)
+        self.assertTrue(result['prompt_version'])
+        self.assertNotIn('secret_metadata', result['usage'])
+
     def test_bad_or_oversized_inputs_fail_before_provider(self):
         for retrieval in [None, {}, {'status': 'candidates_require_review', 'question': 'x', 'sources': []}]:
             client = FakeClient(self.response())
