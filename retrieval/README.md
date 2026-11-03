@@ -44,3 +44,20 @@ The fixture includes four known-source lookups, Naveen's detailed GPU-crash ques
 Keep generated review reports out of commits if they contain private questions. No collection creation, scraping, index rebuild or answer-model calls are performed by the search/evaluation commands.
 
 References: [BAAI model card and query instructions](https://huggingface.co/BAAI/bge-large-en-v1.5), [Qdrant query-points API](https://api.qdrant.tech/api-reference/search/query-points/).
+
+## Evidence decisions from supplied reviews
+
+The separate [evidence decision layer](EVIDENCE.md) binds supplied relevance,
+applicability and claim-support reviews to the exact retrieved question and
+passages. It distinguishes scoped supported claims, related reports with
+insufficient support, no relevant evidence retrieved and review/service errors.
+The separate [model-assisted assessor](ASSESSOR.md) can now infer and validate
+these labels for new passages. Its semantic accuracy still requires evaluation;
+answer generation remains unimplemented. Existing search output stays unassessed
+until a supplied or model-assisted review is applied.
+
+Run the offline evidence contract tests:
+
+```powershell
+& ./.venv/Scripts/python.exe -B -m unittest discover -s tests -p test_evidence.py -v
+```
