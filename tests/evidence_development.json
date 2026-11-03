@@ -1,0 +1,906 @@
+{
+  "notice": "Development cases copied from saved passages. These test a decision contract using supplied labels, not the semantic accuracy of an automatic assessor. Derived questions were not run through retrieval.",
+  "cases": [
+    {
+      "id": "space-explanation",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "Why do VitaShell and PKGj show different amounts of free space after a download?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 228,
+            "score": 0.8461778,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_VitaShell_408_c0",
+              "doc_id": "gh_TheOfficialFloW_VitaShell_408",
+              "source": "github",
+              "title": "GPU crash pkgj and vitashell freespace differs",
+              "url": "https://github.com/TheOfficialFloW/VitaShell/issues/408",
+              "date": "2018-03-29T04:51:09Z",
+              "chunk": "GPU crash pkgj and vitashell freespace differs so recently i was downloading Akibas's Beat from the pkgj but suddenly my internet went down. the pkgj stop the download but later the system seems to show a GPU crash. i restarted the system and it seems okay at first but when i tried to redownload the game, the system crash again after about 5 or so minutes. when i see whether the downloaded files were corrupted or not through vita shell i saw the size on my ux0:/ was about 9 gb but from the pkgj was about 6 gb. *note: i dont know whether this is a pkgj or vitashell bug so i decided to go with both You realize on vitashell the used space is shown not free. ok, just realized it sorry.",
+              "plugin": "VitaShell"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "Why do VitaShell and PKGj show different amounts of free space after a download?",
+        "requested_support": "explanation",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 228,
+            "url": "https://github.com/TheOfficialFloW/VitaShell/issues/408",
+            "passage_sha256": "6a5514a1127eda2c689941f06c9d64543d1805661ffbcd68de3c29ddb820a002",
+            "relevance": "direct",
+            "applicability": "matching",
+            "support": "explanation",
+            "claim": "The cited discussion explains that the VitaShell figure was used space rather than free space.",
+            "evidence_quote": "You realize on vitashell the used space is shown not free.",
+            "contradicted": false,
+            "reason": "The passage explains the display difference; it supports this narrow explanation.",
+            "limitations": [
+              "The passage explains the display difference; it supports this narrow explanation."
+            ]
+          }
+        ]
+      },
+      "expected_status": "supported_answer"
+    },
+    {
+      "id": "space-is-not-gpu-fix",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "Does the used-versus-free-space explanation establish a fix for the GPU crashes?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 228,
+            "score": 0.894803,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_VitaShell_408_c0",
+              "doc_id": "gh_TheOfficialFloW_VitaShell_408",
+              "source": "github",
+              "title": "GPU crash pkgj and vitashell freespace differs",
+              "url": "https://github.com/TheOfficialFloW/VitaShell/issues/408",
+              "date": "2018-03-29T04:51:09Z",
+              "chunk": "GPU crash pkgj and vitashell freespace differs so recently i was downloading Akibas's Beat from the pkgj but suddenly my internet went down. the pkgj stop the download but later the system seems to show a GPU crash. i restarted the system and it seems okay at first but when i tried to redownload the game, the system crash again after about 5 or so minutes. when i see whether the downloaded files were corrupted or not through vita shell i saw the size on my ux0:/ was about 9 gb but from the pkgj was about 6 gb. *note: i dont know whether this is a pkgj or vitashell bug so i decided to go with both You realize on vitashell the used space is shown not free. ok, just realized it sorry.",
+              "plugin": "VitaShell"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "Does the used-versus-free-space explanation establish a fix for the GPU crashes?",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 228,
+            "url": "https://github.com/TheOfficialFloW/VitaShell/issues/408",
+            "passage_sha256": "6a5514a1127eda2c689941f06c9d64543d1805661ffbcd68de3c29ddb820a002",
+            "relevance": "related",
+            "applicability": "unknown",
+            "support": "symptoms_only",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "The explanation resolves the space confusion, not the reported crashes.",
+            "limitations": [
+              "The explanation resolves the space confusion, not the reported crashes."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "personal-firmware-mismatch",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "My PS Vita 1000 3G on 3.65 Enso has GPU driver crashes in several native games. Crashes recur sooner after immediate restart and later after being powered off. I tested the microSD and three adapters. Is there a confirmed fix for my exact setup?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 1002,
+            "score": 0.8118293,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_NoNpDrm_36_c0",
+              "doc_id": "gh_TheOfficialFloW_NoNpDrm_36",
+              "source": "github",
+              "title": "gpu crash after play vita game a while",
+              "url": "https://github.com/TheOfficialFloW/NoNpDrm/issues/36",
+              "date": "2018-07-09T03:56:59Z",
+              "chunk": "gpu crash after play vita game a while 3.67 taiHEN, psv 1000 Not an issue wit this plugin. Blame Sony instead",
+              "firmware": "3.67"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "My PS Vita 1000 3G on 3.65 Enso has GPU driver crashes in several native games. Crashes recur sooner after immediate restart and later after being powered off. I tested the microSD and three adapters. Is there a confirmed fix for my exact setup?",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 1002,
+            "url": "https://github.com/TheOfficialFloW/NoNpDrm/issues/36",
+            "passage_sha256": "4f8b0c647896f2fa17ab6801d2fd645d6fa2eec38e8919e0c13f1b83bc0f1122",
+            "relevance": "related",
+            "applicability": "mismatch",
+            "support": "symptoms_only",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "The passage reports firmware 3.67 and a PSV 1000; no remedy or exact 3.65 Enso result is given.",
+            "limitations": [
+              "The passage reports firmware 3.67 and a PSV 1000; no remedy or exact 3.65 Enso result is given."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "personal-interrupted-download-remedy",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "My PS Vita 1000 3G on 3.65 Enso has GPU driver crashes in several native games. Crashes recur sooner after immediate restart and later after being powered off. I tested the microSD and three adapters. Is there a confirmed fix for my exact setup?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 963,
+            "score": 0.75400424,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_24_c0",
+              "doc_id": "gh_blastrock_pkgj_24",
+              "source": "github",
+              "title": "GPU Crash after the internet down",
+              "url": "https://github.com/blastrock/pkgj/issues/24",
+              "date": "2018-03-29T04:49:01Z",
+              "chunk": "GPU Crash after the internet down so recently i was downloading Akibas's Beat from the pkgj but suddenly my internet went down. the pkgj stop the download but later the system seems to show a GPU crash. i restarted the system and it seems okay at first but when i tried to redownload the game, the system crash again after about 5 or so minutes. the system that i was using was the fat PS vita (version 100x) Any problem like this I got were fixed by deleting everything but the config file from ux0:pkgi/ (via VitaShell) and redownloading the game (this folder doesn't contain any completed/installed downloads, so you won't break any of the games you already installed). PKGj doesn't seem to handle interrupted and/or partial downloads well at all. Alright, just deleted all the files in pkgj and it seems to work. Thanks for the help Hi there, I am just having the same issue and I'm just wondering did you also deleted the .db files? if not then maybe I should redo the SD2VITA, I think I lost 8GB due to gpu crash while downloading 2 games from pkgj v0.55 I'll be honest, it's been like 2 years since I've touched my PSTV. But as I recall, you delete EVERYTHING but the config file from ux0:pkgi/ (via VitaShell) and nothing else, and then you can start up PKGj and start the download of whatever was causing the issue. So if a .db file is in ux0:pkgi/, then it gets deleted. You shouldn't need to redo your entire SD card unless you're having other problems besides a game not downloading properly.",
+              "hardware": "SD2Vita",
+              "plugin": "VitaShell"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "My PS Vita 1000 3G on 3.65 Enso has GPU driver crashes in several native games. Crashes recur sooner after immediate restart and later after being powered off. I tested the microSD and three adapters. Is there a confirmed fix for my exact setup?",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 963,
+            "url": "https://github.com/blastrock/pkgj/issues/24",
+            "passage_sha256": "523e84dfc7bb18241a6d42ae8b25ddb42aad871575688da2ec90b639fe474dd1",
+            "relevance": "related",
+            "applicability": "mismatch",
+            "support": "reported_success",
+            "claim": "A commenter reports success after clearing interrupted-download files; this is not evidence for crashes with a different trigger.",
+            "evidence_quote": "Alright, just deleted all the files in pkgj and it seems to work.",
+            "contradicted": false,
+            "reason": "Success is reported after interrupted downloads. This does not establish applicability to crashes across native games.",
+            "limitations": [
+              "Success is reported after interrupted downloads. This does not establish applicability to crashes across native games."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "same-code-different-operation",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "0x80431068"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 924,
+            "score": 0.82927203,
+            "matching_query_identifiers": [
+              "0x80431068"
+            ],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_64_c0",
+              "doc_id": "gh_blastrock_pkgj_64",
+              "source": "github",
+              "title": "HTTP download error 0x80431068",
+              "url": "https://github.com/blastrock/pkgj/issues/64",
+              "date": "2018-05-01T00:40:20Z",
+              "chunk": "HTTP download error 0x80431068 Version of firmware: 3.6.0 Version of PKGj: [insert version] 0.15 ## Steps to reproduce the issue Attempted to download any game of the list in PKGj, all leads to: ERROR Download failure: HttpError: HTTP download error 0x80431068 remove s from all https links in your config. Already done that, the list loads fine. The download cancels and I get that error. i have the same error during download and when i cancel the download As you can see here: https://vitadevwiki.com/vita/Error_Codes , this error corresponds to: SCE_HTTP_ERROR_TIMEOUT. So I don't think this has to do with pkgj. sorry about my english. I have this problem too, but i think this problem does not corresponds to pkgj... i think this error is the psvita standby mode... vita turns off the wifi so pkgj show http error download... If you keep vita alive (ex: touching the screen), or change vita settings for 30min stand by, the game is downloaded successfully, because vita does not shutdown wifi... again, sorry about my english... You might be right @barbabarros, I couldn't make pkgj support the vita going to sleep, but I didn't check what error it gives, so it may be what happens here. In my case, I changed the stand-by delay to 30min in the settings, as you said, to avoid this. Anyway, thank you for your insight. Haha. Have the same issue. This program unable to see https://nops.youknowwhat.stuff only http. but http downloads are not available. It downloaded but then i got an error: \"Download failure: scePromoterUtilityPromotePkgWithRif failed: 0x80870004\". It is a defeinetly bug of the pkgj program That's a different issue: #74 I've been receiving this error too and it's definitely NOT due to the Vita going into sleep mode. I've checked this at least 5 times making sure it didn't go into sleep mode but it always returns this error. The strange thing is that it only occurs with larger files. i was able to download smaller games (~1GB) no problem, but if I try to download a larger game (>2GB) it stops downloading the file about halfway through and then when I cancel the dowload it returns this error. Having this issue too. Haven't been able to download a game in over a month. Any solution? duplicate of #104 and #141, sorry guys I just can't reproduce these...",
+              "error_code": "0x80431068",
+              "plugin": "PKGj"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 924,
+            "url": "https://github.com/blastrock/pkgj/issues/64",
+            "passage_sha256": "f1f80516574c7f57d7c9f07bf97de5e270a8228219cb4837f7684cfa5909adb5",
+            "relevance": "related",
+            "applicability": "mismatch",
+            "support": "reported_success",
+            "claim": "A commenter reports that keeping the console awake prevented a download timeout; other commenters report the error without standby.",
+            "evidence_quote": "the game is downloaded successfully",
+            "contradicted": true,
+            "reason": "The error code matches, but the passage concerns downloads rather than list refresh; standby-related results conflict.",
+            "limitations": [
+              "The error code matches, but the passage concerns downloads rather than list refresh; standby-related results conflict."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "compatibility-pack-guidance",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "0x80431068"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 630,
+            "score": 0.8238075,
+            "matching_query_identifiers": [
+              "0x80431068"
+            ],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_351_c0",
+              "doc_id": "gh_blastrock_pkgj_351",
+              "source": "github",
+              "title": "Can\u2019t get list: httperror 0x80431068 network timeout",
+              "url": "https://github.com/blastrock/pkgj/issues/351",
+              "date": "2020-04-18T00:01:03Z",
+              "chunk": "Can\u2019t get list: httperror 0x80431068 network timeout Greetings! I get the above error when i refresh the game list on pkgj. Hardware: PSV Version of firmware: 3.60 Spoofed 3.69 Version of PKGj: 0.54 DNS set to Auto Config.txt: Url_comppack http://gateway.fast.sheridanc.on.ca/ Makes no difference on error whether i add or delete the above line. Hangs for about 10 seconds on \u201cRefreshing games compatibility packs [9/10]... 100% and gives me error \u201ccan\u2019t get list: HttpError: sceHttpSendRequesr failed: 0x80431068 Network timeout\u201d I uninstalled itls-enso from within app itself and rebooted hoping it would make a difference but it didn\u2019t. Thank you for your time. im having save problem Hardware: PSV Version of firmware: 3.60 Spoofed 3.73 Version of PKGj: 0.54 DNS set to Auto Config.txt: Url_comppack http://gateway.fast.sheridanc.on.ca/ i have installed itls-enso uninstalled its the same and im having osyscall6 plug in i still cant download compatibility packs after i changed config.txt i managed to see them but after i used autoplugin 2 with refresh triangle in extras for pkgj i dont see compatibility packs anymore im so confused i tried to use proxy i avoided network error and now im having http error cant get list!! the same error same to me I can't even use curl to get some information from that URL. Yeah, same here =/. Not sure what's going on. I tried deleting and reinstalling without avail, same error code. Tried switching wifi's, disabling 0syscall6 plug-in, deleting pkgi/PKGJ folders, and nada... +1, same here. same here. same here. I tried all, nothing work. I tried remove the \"s\"in https, I tried to put the website that was on Nopaystation as compatibility packages, but nothing too.. \"https://gitlab.com/nopaystation_repos/nps_compati_packs/tree/master\" If we can't fix the issue, at least we can share the lastest files with each other lol. So who has the lastest update? I'll check the dates on my files when I get a chance yo guys i find a temporary fix check this video it helped me at least this guy is awesome https://www.youtube.com/watch?v=HFnKPnv8Kn8&list=LLdbFOe4RwpyoUKDfZgEqxWg&index=3&t=0s I guess we'll just have to stick with downloading the games on PC.... I hope we get another version update because I'm already fed up with how many attempts I've tried to refresh the list. Compatibility packs are disabled by default as of version 0.55. Please remove `url_comppack` from the config file and use ref00d or 0syscall6.",
+              "firmware": "3.60",
+              "error_code": "0x80431068",
+              "plugin": "AutoPlugin"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 630,
+            "url": "https://github.com/blastrock/pkgj/issues/351",
+            "passage_sha256": "9db519327021fc04a7e12d1e1b4bd21ad34e52b6681c42a7f6d480a358ccf1c0",
+            "relevance": "direct",
+            "applicability": "unknown",
+            "support": "documented_guidance",
+            "claim": "The discussion gives version-specific guidance about compatibility-pack configuration.",
+            "evidence_quote": "Compatibility packs are disabled by default as of version 0.55.",
+            "contradicted": false,
+            "reason": "Guidance concerns compatibility packs and a version-specific configuration; ask which refresh stage, PKGj version and configuration apply. It is not a confirmed general timeout fix.",
+            "limitations": [
+              "Guidance concerns compatibility packs and a version-specific configuration; ask which refresh stage, PKGj version and configuration apply. It is not a confirmed general timeout fix."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "refresh-suggestion-no-outcome",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "0x80431068"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 535,
+            "score": 0.8081621,
+            "matching_query_identifiers": [
+              "0x80431068"
+            ],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_453_c0",
+              "doc_id": "gh_blastrock_pkgj_453",
+              "source": "github",
+              "title": "PKGj can't refresh",
+              "url": "https://github.com/blastrock/pkgj/issues/453",
+              "date": "2025-11-19T08:03:02Z",
+              "chunk": "PKGj can't refresh When trying to refresh through PKGj itself it freezes at 0% and after a while stops with \"can't get list: HttpError: HTTP download error 0x80431068\" When trying it throught autoplugin in freezes at 24.20 KB on any list and only way from here is to force reboot. I have tried to fully reinstall by deleting folder in vita shell My wi-fi is stable and spoofing is setted correctly. I do not using any dns or proxy I'm using 3.65 enso I'm using sd2vita via YAMT It seem like i dont have any config.txt file I have exactly the same problem, I tried to install iTLS but it still freezes at 0% after installing iTLS PKGj asked to update but that didn't help either. I have exactly the same problem Damn i have same problem Try to no use the full plugin of iTLS, only updating the CA certificates should work.",
+              "firmware": "3.65",
+              "error_code": "0x80431068",
+              "hardware": "SD2Vita",
+              "plugin": "YAMT"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 535,
+            "url": "https://github.com/blastrock/pkgj/issues/453",
+            "passage_sha256": "380e3b99785e1f862f5cd79f96f720d7669b7abf5525cb1f727e2a277b641045",
+            "relevance": "direct",
+            "applicability": "unknown",
+            "support": "suggestion_without_outcome",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "The certificate-related suggestion has no successful outcome recorded in this passage.",
+            "limitations": [
+              "The certificate-related suggestion has no successful outcome recorded in this passage."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "different-error-success",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "0x80431068"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 785,
+            "score": 0.8415903,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_194_c0",
+              "doc_id": "gh_blastrock_pkgj_194",
+              "source": "github",
+              "title": "can\u00b4t get list: HttpError: sceHttpSendRequest failed: 0x80436007",
+              "url": "https://github.com/blastrock/pkgj/issues/194",
+              "date": "2018-08-27T16:00:59Z",
+              "chunk": "can\u00b4t get list: HttpError: sceHttpSendRequest failed: 0x80436007 Version of firmware: 3.60 Version of PKGj: v0.33 1. Start PKGj 2. Error `No items! Try to refresh` 3. I press the triangle button to enter the menu 4. I choose the option \"Refresh\" 5. Then the following error message appears: `can\u00b4t get list: HttpError: sceHttpSendRequest failed: 0x80436007` Got the same problem a few days ago. Delete all files in the pkgi folder except for your config.txt. That's what fixed it for me. Solved, thanks @RuggeDX!",
+              "firmware": "3.60",
+              "error_code": "0x80436007",
+              "plugin": "PKGj"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "PKGj cannot refresh its list and reports HTTP error 0x80431068.",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 785,
+            "url": "https://github.com/blastrock/pkgj/issues/194",
+            "passage_sha256": "c526aac42d371547d969a3ce30cc0b4358c25521e2d0c25a74d717c70cf7369d",
+            "relevance": "related",
+            "applicability": "mismatch",
+            "support": "reported_success",
+            "claim": "A commenter reports success for error 0x80436007, a different error from the question.",
+            "evidence_quote": "That's what fixed it for me.",
+            "contradicted": false,
+            "reason": "A reported success for 0x80436007 is not confirmation for the requested 0x80431068 error.",
+            "limitations": [
+              "A reported success for 0x80436007 is not confirmation for the requested 0x80431068 error."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "commit-not-installable-release",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "Which installable VitaShell release contains the fix for the PS TV triangle crash on firmware 3.73?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "3.73"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 139,
+            "score": 0.76822734,
+            "matching_query_identifiers": [
+              "3.73"
+            ],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_VitaShell_552_c0",
+              "doc_id": "gh_TheOfficialFloW_VitaShell_552",
+              "source": "github",
+              "title": "When i press triangle on ps tv it crashes on 3.73",
+              "url": "https://github.com/TheOfficialFloW/VitaShell/issues/552",
+              "date": "2019-12-01T16:26:46Z",
+              "chunk": "When i press triangle on ps tv it crashes on 3.73 I want to add some storage to my ps tv with a usb drive and now i can't. Same problem any update ? Cannot refresh the live area + nonpdrm game won't show up. https://m.youtube.com/watch?v=K2cp76rSW68 Fixed in 3fd119d5341fafa2dbb065c71fbdadeb5d811cb3.",
+              "firmware": "3.73",
+              "plugin": "NoNpDrm"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "Which installable VitaShell release contains the fix for the PS TV triangle crash on firmware 3.73?",
+        "requested_support": "guidance",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 139,
+            "url": "https://github.com/TheOfficialFloW/VitaShell/issues/552",
+            "passage_sha256": "eba84ba93c00101a75ad5bbd6659c9db394f84a2ecfa48761b92318a897c4d81",
+            "relevance": "direct",
+            "applicability": "unknown",
+            "support": "documented_guidance",
+            "claim": "The thread identifies a fixing commit but does not identify an installable release.",
+            "evidence_quote": "Fixed in 3fd119d5341fafa2dbb065c71fbdadeb5d811cb3.",
+            "contradicted": false,
+            "reason": "The passage identifies a fixing commit, but not a release containing it. Do not invent an installable version.",
+            "limitations": [
+              "The passage identifies a fixing commit, but not a release containing it. Do not invent an installable version."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "scoped-community-success",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "Has anyone reported success with a VitaShell version change for triangle-button crashes on firmware 3.73?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "3.73"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 142,
+            "score": 0.77957344,
+            "matching_query_identifiers": [
+              "3.73"
+            ],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_VitaShell_549_c0",
+              "doc_id": "gh_TheOfficialFloW_VitaShell_549",
+              "source": "github",
+              "title": "vitashell restart my psvita when i try to go to option",
+              "url": "https://github.com/TheOfficialFloW/VitaShell/issues/549",
+              "date": "2019-10-24T01:13:45Z",
+              "chunk": "vitashell restart my psvita when i try to go to option when i try to enter Option with triangle button to refresh my live area it restart my pstiva suddenly idk what to do to refresh my live area plz help me FW 3.73 vitashell v 2.00 This happened to me to, what i do to fix is everytime i want to refresh i change vitashell theme and restart the app, open the app again and its fix (but need to do this every time) With your method, I was able to access the option menu, but when I want to refresh LiveArea, it will reboot (once it hit 25%). I am also on FW 3.73. VitaShell has not been updated to 3.73 yet that\u2018s why FOUND THE ANSWER!!! - The problem of vitashell restarting with triangle was due to \"enabling unsafe homebrew\" on versions 1.83 and 1.90. When I unclicked that, I could hit triangle safely. - Without enabling unsafe homebrew, I could only see ux0 when I opened vitashell v1.9 so I placed the vpk I wanted to install (which was vitashell vpk for version 2.02) in ux0 and loaded it from there. - It loaded successfully w/o error. I then clicked \"enable unsafe homebrew\" and opened vitashell v2.02. This version has the triangle button fixed, so I could hit it even with enable unsafe homebrew clicked and it would not restart. This took me so long to find so I hope it helps others. Peace.",
+              "firmware": "3.73",
+              "plugin": "VitaShell"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "Has anyone reported success with a VitaShell version change for triangle-button crashes on firmware 3.73?",
+        "requested_support": "reported_remedy",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 142,
+            "url": "https://github.com/TheOfficialFloW/VitaShell/issues/549",
+            "passage_sha256": "90dd4c58e5dad91b54fc2af32d8b7dbce4413ea512bc7620e60388cd3168a2ee",
+            "relevance": "direct",
+            "applicability": "matching",
+            "support": "reported_success",
+            "claim": "A commenter in the firmware 3.73 thread reports success after installing VitaShell 2.02; this is a scoped community report.",
+            "evidence_quote": "This version has the triangle button fixed",
+            "contradicted": false,
+            "reason": "A commenter reports success with a version change; preserve it as a scoped self-report. The earlier workaround also has a failure report.",
+            "limitations": [
+              "A commenter reports success with a version change; preserve it as a scoped self-report. The earlier workaround also has a failure report."
+            ]
+          }
+        ]
+      },
+      "expected_status": "supported_answer"
+    },
+    {
+      "id": "triangle-different-firmware",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "VitaShell crashes when I press triangle on PS TV firmware 3.73.",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [
+          "3.73"
+        ],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 100,
+            "score": 0.8451029,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_TheOfficialFloW_VitaShell_617_c0",
+              "doc_id": "gh_TheOfficialFloW_VitaShell_617",
+              "source": "github",
+              "title": "Vitashell 2.02 crashes in the firmware 3.74 ",
+              "url": "https://github.com/TheOfficialFloW/VitaShell/issues/617",
+              "date": "2022-05-27T05:55:21Z",
+              "chunk": "Vitashell 2.02 crashes in the firmware 3.74 Under the new PSV firmware 3.74 with henkaku, vitashell 2.02 crashes when push the triangle button in the root folder. Could you please try to fix it? thank you. I have amended the source code to address this issue, appears to be working on my PS Vita OFW 3.74 using Hencore\u00b2. Are you able to try the fix and see if it works for you? If you build the source code, you will only need to patch `kernel.skprx`/`patch.skprx` in `ux0:/Vitashell/modules`. I just built the code and copied these files to the appropriate location and that seemed to work fine for me. @calum904 I just built it, and copied over those files. Pressing triangle now doesn't crash. Just making sure though, mounting gamecard ux0 is supposed to be only for SD2VITA & results in a crash otherwise? Because pressing that with a real gamecard crashes vitashell and once more the triangle issue returns until you copy again those 2 files.",
+              "firmware": "3.74",
+              "hardware": "SD2Vita",
+              "plugin": "VitaShell"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "VitaShell crashes when I press triangle on PS TV firmware 3.73.",
+        "requested_support": "confirmed_fix",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 100,
+            "url": "https://github.com/TheOfficialFloW/VitaShell/issues/617",
+            "passage_sha256": "9c638c281631c7f3207b65dfbe92da5f2756dbcdd7dc5d05b1e2276ce9c979ce",
+            "relevance": "related",
+            "applicability": "mismatch",
+            "support": "reported_success",
+            "claim": "A commenter reports success after replacing modules in a firmware 3.74 setup, with recurrence circumstances also described.",
+            "evidence_quote": "Pressing triangle now doesn't crash.",
+            "contradicted": false,
+            "reason": "The passage describes firmware 3.74, not the requested PS TV 3.73 setup; it cannot establish exact applicability and includes recurrence circumstances.",
+            "limitations": [
+              "The passage describes firmware 3.74, not the requested PS TV 3.73 setup; it cannot establish exact applicability and includes recurrence circumstances."
+            ]
+          }
+        ]
+      },
+      "expected_status": "related_reports_insufficient_support"
+    },
+    {
+      "id": "unrelated-cooking",
+      "retrieval": {
+        "status": "candidates_require_review",
+        "question": "How do I bake a sourdough loaf in a Dutch oven?",
+        "collection": "vita_docs",
+        "embedding_model": "BAAI/bge-large-en-v1.5",
+        "query_prefix": "Represent this sentence for searching relevant passages: ",
+        "ranking": "identifier_mentions_then_cosine",
+        "query_identifiers": [],
+        "min_score": null,
+        "evidence_assessment": "not_assessed",
+        "notice": "Similarity ranks passages; it is not confidence, proof of a fix, or an evidence assessment.",
+        "sources": [
+          {
+            "point_id": 882,
+            "score": 0.4531516,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_99_c0",
+              "doc_id": "gh_blastrock_pkgj_99",
+              "source": "github",
+              "title": "Suggestion: Bake in config URLs for script into repo",
+              "url": "https://github.com/blastrock/pkgj/issues/99",
+              "date": "2018-07-02T01:47:49Z",
+              "chunk": "Suggestion: Bake in config URLs for script into repo All you'd need to do is point the program to look at this repo for the config on first install, it grabs it from the external site and install it. Nice thing is if the domain is shut down you can quickly point people to a new one and set PKGj to re-try for this repo for the new URLs. This eliminates a step in the setup process and more idiot-proofs it. I agree with you on the benefits, but I prefer not associating this repository with illegal contents. It was the decision of the previous maintainer too.",
+              "plugin": "PKGj"
+            }
+          },
+          {
+            "point_id": 866,
+            "score": 0.44146916,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_114_c0",
+              "doc_id": "gh_blastrock_pkgj_114",
+              "source": "github",
+              "title": "pkgj.elf Where to put it?",
+              "url": "https://github.com/blastrock/pkgj/issues/114",
+              "date": "2018-07-05T06:17:20Z",
+              "chunk": "pkgj.elf Where to put it? Version of firmware: [insert version] Version of PKGj: [insert version] ## Steps to reproduce the issue - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] Obtained result: [insert the result you got here] Expected result: [insert what you expected here] [please make sure to add all possible details, like the title id (the 9-chars string in the left column) of the game you are talking about] pkgj.elf contains debug symbols, you don't need it \u0e40\u0e21\u0e37\u0e48\u0e2d \u0e2a. 7 \u0e01.\u0e04. 2561 \u0e40\u0e27\u0e25\u0e32 01:40 Philippe Daouadi <notifications@github.com> \u0e40\u0e02\u0e35\u0e22\u0e19\u0e27\u0e48\u0e32: Thank you",
+              "plugin": "PKGj"
+            }
+          },
+          {
+            "point_id": 705,
+            "score": 0.43898508,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_273_c0",
+              "doc_id": "gh_blastrock_pkgj_273",
+              "source": "github",
+              "title": "[request] new games?",
+              "url": "https://github.com/blastrock/pkgj/issues/273",
+              "date": "2019-02-09T06:31:49Z",
+              "chunk": "[request] new games? Version of firmware: [insert version] Version of PKGj: [insert version] ## Steps to reproduce the issue - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] Obtained result: [insert the result you got here] Expected result: [insert what you expected here] [please make sure to add all possible details, like the title id (the 9-chars string in the left column) of the game you are talking about]",
+              "plugin": "PKGj"
+            }
+          },
+          {
+            "point_id": 706,
+            "score": 0.43898508,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_272_c0",
+              "doc_id": "gh_blastrock_pkgj_272",
+              "source": "github",
+              "title": "[request] new games?",
+              "url": "https://github.com/blastrock/pkgj/issues/272",
+              "date": "2019-02-09T06:31:47Z",
+              "chunk": "[request] new games? Version of firmware: [insert version] Version of PKGj: [insert version] ## Steps to reproduce the issue - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] Obtained result: [insert the result you got here] Expected result: [insert what you expected here] [please make sure to add all possible details, like the title id (the 9-chars string in the left column) of the game you are talking about]",
+              "plugin": "PKGj"
+            }
+          },
+          {
+            "point_id": 751,
+            "score": 0.43801835,
+            "matching_query_identifiers": [],
+            "payload": {
+              "chunk_id": "gh_blastrock_pkgj_223_c0",
+              "doc_id": "gh_blastrock_pkgj_223",
+              "source": "github",
+              "title": "Filter by installed games",
+              "url": "https://github.com/blastrock/pkgj/issues/223",
+              "date": "2018-11-07T18:10:37Z",
+              "chunk": "Filter by installed games Version of firmware: [insert version] Version of PKGj: [insert version] ## Steps to reproduce the issue - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] - [insert the steps to reproduce the issue here] Obtained result: [insert the result you got here] Expected result: [insert what you expected here] [please make sure to add all possible details, like the title id (the 9-chars string in the left column) of the game you are talking about] duplicate of #40",
+              "plugin": "PKGj"
+            }
+          }
+        ],
+        "fetched_points": 20,
+        "skipped": {
+          "missing_passage": 0,
+          "invalid_source_url": 0,
+          "duplicate_source": 0
+        }
+      },
+      "review": {
+        "schema_version": 1,
+        "question": "How do I bake a sourdough loaf in a Dutch oven?",
+        "requested_support": "explanation",
+        "assessor": "assistant_manual_development_review",
+        "assessments": [
+          {
+            "point_id": 882,
+            "url": "https://github.com/blastrock/pkgj/issues/99",
+            "passage_sha256": "da620474a14d64d36bcb3b56bf4de67800ad3b9bbbe8f971e768410bec47acb3",
+            "relevance": "irrelevant",
+            "applicability": "not_applicable",
+            "support": "none",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice.",
+            "limitations": [
+              "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice."
+            ]
+          },
+          {
+            "point_id": 866,
+            "url": "https://github.com/blastrock/pkgj/issues/114",
+            "passage_sha256": "93e23324ab775ba3cd2c631b50008ae7e49128d152ac7bf2895223cab5ddda50",
+            "relevance": "irrelevant",
+            "applicability": "not_applicable",
+            "support": "none",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice.",
+            "limitations": [
+              "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice."
+            ]
+          },
+          {
+            "point_id": 705,
+            "url": "https://github.com/blastrock/pkgj/issues/273",
+            "passage_sha256": "0403a29e7717192040bbb2dea6260199288ced8bab1b5fa4ea806f78c1ff9fbe",
+            "relevance": "irrelevant",
+            "applicability": "not_applicable",
+            "support": "none",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice.",
+            "limitations": [
+              "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice."
+            ]
+          },
+          {
+            "point_id": 706,
+            "url": "https://github.com/blastrock/pkgj/issues/272",
+            "passage_sha256": "0403a29e7717192040bbb2dea6260199288ced8bab1b5fa4ea806f78c1ff9fbe",
+            "relevance": "irrelevant",
+            "applicability": "not_applicable",
+            "support": "none",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice.",
+            "limitations": [
+              "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice."
+            ]
+          },
+          {
+            "point_id": 751,
+            "url": "https://github.com/blastrock/pkgj/issues/223",
+            "passage_sha256": "d7ef1d901088551049877036fede33a776ce06fedd8383d297220255b55b787a",
+            "relevance": "irrelevant",
+            "applicability": "not_applicable",
+            "support": "none",
+            "claim": "",
+            "evidence_quote": "",
+            "contradicted": false,
+            "reason": "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice.",
+            "limitations": [
+              "All returned Vita passages are unrelated to baking; lexical overlap does not support cooking advice."
+            ]
+          }
+        ]
+      },
+      "expected_status": "no_relevant_evidence_retrieved"
+    }
+  ]
+}
