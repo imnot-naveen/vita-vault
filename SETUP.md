@@ -50,6 +50,6 @@ Run downstream cleaning/chunking/indexing scripts from the repository root becau
 
 The root `config.py` loads local `.env` values. Keep secrets out of committed files. Current defaults name the `vita_docs` collection, cosine similarity, 1,024 vector dimensions and `BAAI/bge-large-en-v1.5`. Query and document embedding settings must remain compatible.
 
-The [retrieval command](retrieval/README.md) now searches the existing index and returns source candidates with full passages and URLs. Its small development fixture and tests are documented there. Candidate relevance and supported fixes still require review; there is no query HTTP API or answer-generation implementation yet.
+The [retrieval command](retrieval/README.md) searches the existing index and returns source candidates with full passages and URLs. The [source-returning HTTP API](api/README.md) now exposes the same unassessed retrieval contract. Install its pinned HTTP additions with `pip install -r requirements-api.txt`, then run `python -m uvicorn api.main:app --host 127.0.0.1 --port 8000` using the project `.venv`. Evidence assessment remains a separate explicit step, and generated answers/frontend integration remain pending.
 
 API references: [SentenceTransformer model loading and encoding](https://www.sbert.net/docs/package_reference/sentence_transformer/model.html), [official Qdrant Python client](https://github.com/qdrant/qdrant-client).

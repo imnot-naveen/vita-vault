@@ -1,5 +1,8 @@
 # Source retrieval
 
+For HTTP access to the same source-bearing, unassessed results, see the
+[source API setup and contract](../api/README.md). The CLI below remains available.
+
 From the repository root in PowerShell, with Docker Desktop and the existing Qdrant container running:
 
 ```powershell
