@@ -1,0 +1,1 @@
+"""Vita Vault HTTP interface."""
