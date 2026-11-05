@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Vita Vault — a PS Vita troubleshooting workspace. Search community source passages with your console context.">
+<title>Vita Vault — Troubleshooting, in your element.</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to troubleshooting</a>
+<header class="nav">
+ <a class="brand" href="#home" aria-label="Vita Vault home"><span class="mark">vv</span><span>vita<span class="thin">vault</span></span></a>
+ <nav aria-label="Main navigation"><a href="#tools">LiveArea</a><a href="#problems">Common problems</a><a class="nav-start" href="#workspace">Open Debug <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main>
+ <section id="home" class="hero" aria-labelledby="hero-title">
+  <div class="hero-stage">
+   <div class="blue-light" aria-hidden="true"></div>
+   <div class="ghost-type" aria-hidden="true">VITA</div>
+   <div class="device-wrap"><img class="device" src="https://upload.wikimedia.org/wikipedia/commons/c/ce/PlayStation-Vita-1101-FL_%28DYK%29.png" alt="Original black PS Vita PCH-1000-series console, photographed by Evan-Amos" width="5069" height="2487" fetchpriority="high"><div class="device-light" aria-hidden="true"></div></div>
+   <div class="hero-copy">
+    <div class="eyebrow"><span class="blue-dot"></span> THE PS VITA TROUBLESHOOTING SPACE</div>
+    <h1 id="hero-title">Let’s work<br>it <span>out.</span></h1>
+    <p>A strange error. A missing memory card.<br>Your next step starts here.</p>
+    <div class="hero-actions"><a class="primary" href="#workspace">Start debugging <span aria-hidden="true">↗</span></a><button id="preview-motion" class="text-button" type="button">Preview scroll <span aria-hidden="true">↓</span></button></div>
+   </div>
+   <div class="scroll-copy" aria-hidden="true"><span>Familiar hardware.</span><br>A clearer way forward.</div>
+   <div class="hero-bottom"><span>PCH-1000 SERIES · CRYSTAL BLACK</span><span>SCROLL TO YOUR LIVEAREA <span aria-hidden="true">↓</span></span></div>
+  </div>
+ </section>
+ <section id="tools" class="livearea" aria-labelledby="tools-title">
+  <div class="wave wave-one" aria-hidden="true"></div><div class="wave wave-two" aria-hidden="true"></div>
+  <div class="info-bar"><span>VITA VAULT <span class="info-divider">/</span> LIVEAREA</span><span class="symbols" aria-hidden="true">△ ○ × □</span><span>CHOOSE YOUR STARTING POINT</span></div>
+  <div class="area-content">
+   <div class="eyebrow reveal">A FAMILIAR PLACE TO START</div><h2 id="tools-title" class="reveal">What’s going on?</h2>
+   <p class="area-sub reveal">Pick a bubble. Find a little clarity.</p>
+   <div class="bubbles">
+    <button class="bubble-link reveal" data-tool="debug" type="button"><span class="orb orb-debug"><span class="tool-glyph" aria-hidden="true">⌁</span><span class="orb-shine"></span></span><strong>Vita Debug</strong><span>Work through a symptom</span></button>
+    <button class="bubble-link reveal" data-tool="common" type="button"><span class="orb orb-common"><span class="tool-glyph" aria-hidden="true">?</span><span class="orb-shine"></span></span><strong>Common Problems</strong><span>Find a familiar issue</span></button>
+    <button class="bubble-link reveal" data-tool="ask" type="button"><span class="orb orb-ask"><span class="tool-glyph" aria-hidden="true">↗</span><span class="orb-shine"></span></span><strong>Ask Vita Vault</strong><span>Follow your own question</span></button>
+   </div>
+   <div class="page-dots" aria-hidden="true"><i></i><i class="active"></i><i></i></div>
+  </div>
+ </section>
+ <section id="problems" class="problems section-pad" aria-labelledby="problems-title">
+  <div class="section-intro reveal"><div><div class="eyebrow">COMMON PROBLEMS</div><h2 id="problems-title">Sound familiar?</h2></div><p>Start with what you’re seeing.<br>We’ll keep your console’s details in view.</p></div>
+  <div class="problem-list">
+   <button type="button" class="problem reveal" data-question="My Vita isn't recognising its memory card."><span class="problem-number">01</span><span><strong>Storage & memory</strong><small>Missing cards, adapters, and content</small></span><span class="arrow" aria-hidden="true">↗</span></button>
+   <button type="button" class="problem reveal" data-question="My Vita won't start or charge normally."><span class="problem-number">02</span><span><strong>Power & startup</strong><small>Charging, blue lights, and boot issues</small></span><span class="arrow" aria-hidden="true">↗</span></button>
+   <button type="button" class="problem reveal" data-question="My Vita can't connect to Wi-Fi."><span class="problem-number">03</span><span><strong>Connections</strong><small>Wi-Fi, USB, and remote play</small></span><span class="arrow" aria-hidden="true">↗</span></button>
+   <button type="button" class="problem reveal" data-question="An app on my Vita is showing an error code."><span class="problem-number">04</span><span><strong>Apps & error codes</strong><small>Crashes, unexpected messages, and failed launches</small></span><span class="arrow" aria-hidden="true">↗</span></button>
+  </div>
+ </section>
+ <section id="workspace" class="workspace section-pad" aria-labelledby="workspace-title">
+  <div class="workspace-heading reveal"><div class="eyebrow"><span class="blue-dot"></span> VITA DEBUG</div><h2 id="workspace-title">One step at a time.</h2><p>Tell us what happened. Keep the useful details.</p></div>
+  <div class="debug-shell reveal">
+   <aside class="context"><div class="context-label">YOUR CONSOLE</div><div class="console-mini" aria-hidden="true">PS VITA</div><label for="model">Model</label><select id="model"><option value="">I’m not sure</option><option>PCH-1000 · Original OLED</option><option>PCH-2000 · Slim</option><option>PlayStation TV</option></select><label for="firmware">Firmware <span>optional</span></label><input id="firmware" placeholder="e.g. 3.65" maxlength="16"><div class="context-note"><span class="blue-dot"></span> Context stays with your question.</div></aside>
+   <div class="debug-main"><div class="debug-tabs" role="group" aria-label="Question mode"><button type="button" data-mode="debug" aria-pressed="true">Troubleshoot</button><button type="button" data-mode="ask" aria-pressed="false">Ask a question</button><span>SOURCE SEARCH</span></div>
+    <form id="debug-form"><label id="question-label" for="question">What’s happening?</label><textarea id="question" rows="4" placeholder="Describe the issue, any error code, and what changed before it started." required maxlength="4000"></textarea><label class="prior-label" for="prior-tests">What have you tried? <span>optional</span></label><textarea id="prior-tests" rows="2" maxlength="2000" placeholder="Previous checks, changes, and what happened afterward."></textarea><div class="input-bottom"><span>Add an error code if you have one.</span><button class="primary" type="submit">Search sources <span aria-hidden="true">↗</span></button></div></form>
+    <div id="search-status" role="status" aria-live="polite" aria-atomic="true"></div><section id="response" class="response" aria-label="Search results" tabindex="-1" hidden></section>
+    <div class="sources-note"><span aria-hidden="true">↳</span><div><strong>Read the source. Keep the context.</strong><p>Search returns community passages for you to review. A similar report or matching error code does not confirm a fix for your console.</p></div></div>
+   </div>
+  </div>
+ </section>
+</main>
+<footer><a class="brand" href="#home">vita<span class="thin">vault</span></a><span>An independent space for troubleshooting.</span><details><summary>Design references & image credit</summary><div><a href="https://manuals.playstation.net/document/en/psvita/basic/screens.html" target="_blank" rel="noreferrer">Sony: original LiveArea interface</a><a href="https://www.apple.com/iphone/" target="_blank" rel="noreferrer">Apple: device presentation reference</a><a href="https://commons.wikimedia.org/wiki/File:PlayStation-Vita-1101-FL_(DYK).png" target="_blank" rel="noreferrer">PCH-1000-series photo: Evan-Amos / Wikimedia Commons, public domain</a></div></details></footer>
+<script src="app.js"></script>
+<script src="search.js"></script>
+</body></html>

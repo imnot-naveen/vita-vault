@@ -21,7 +21,7 @@ offline and reports service failure if unavailable. The first search loads the
 model; later requests reuse the app-owned retriever/model. Search access is
 serialized within one server process. The default command starts one worker.
 
-Open [interactive API documentation](http://127.0.0.1:8000/docs) or
+Open the [Vita Vault UI](http://127.0.0.1:8000/) or [interactive API documentation](http://127.0.0.1:8000/docs) or
 [OpenAPI JSON](http://127.0.0.1:8000/openapi.json) while the server is running.
 
 ## POST /search
@@ -97,8 +97,7 @@ environment; a full fresh reinstall on another platform is not established.
 
 This completes the source-returning API layer. The separate assessment CLI and
 [evidence-quality limitations](../retrieval/HARD_CASES.md) remain in place.
-Generated answers, assessment endpoints, browser/frontend connection and its
-origin configuration are later work.
+The browser UI serves from the same origin at `/`; see `frontend/README.md`. Generated answers and assessment endpoints remain later work.
 
 Implementation references: [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/),
 [lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/),
