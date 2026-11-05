@@ -2,11 +2,13 @@
 
 from contextlib import asynccontextmanager
 from threading import Lock
+from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from retrieval.search import InvalidInput, Retriever
@@ -97,6 +99,12 @@ def create_app(*, retriever_factory=Retriever):
         except Exception:
             # Backend exception strings may contain credentials or local paths.
             return JSONResponse(status_code=503, content={'status': 'service_error', 'message': SERVICE_MESSAGE})
+
+    # Register last so API routes retain their existing behavior. Serve only
+    # the dedicated public directory, never repository files or credentials.
+    frontend = Path(__file__).resolve().parents[1] / 'frontend'
+    if (frontend / 'index.html').is_file():
+        application.mount('/', StaticFiles(directory=frontend, html=True), name='frontend')
 
     return application
 
