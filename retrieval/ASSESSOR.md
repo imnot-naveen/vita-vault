@@ -36,8 +36,9 @@ or calling Qdrant:
 The report preserves retrieval, review, decision, prompt version and the
 provider's token/cost counters when available. A supported result contains only
 scoped permitted claims. Related reports do not become a confirmed repair.
-No answer model, HTTP API, frontend integration, scraping or index writes are
-included. The existing `retrieval.search` command still returns unassessed
+No answer model, scraping or index writes are included. Optional HTTP/frontend
+integration is documented in `../api/README.md` and `../frontend/README.md`.
+The existing `retrieval.search` command still returns unassessed
 candidates; assessment is an explicit separate command or Python function.
 
 HTTP/service failures return `service_error`; malformed model reviews return
@@ -104,8 +105,24 @@ matched 4/4 reserved decisions, with field disagreements retained. In particular
 the release-number question still had incorrect intent/support labels despite
 its conservative final decision. See the detailed note before interpreting
 the counters as quality evidence. The schema is unchanged; prompt version is
-now `vita-evidence-v3`.
+`vita-evidence-v3` for those historical runs.
 
-Next: independent label review, fresh full-retrieval questions and improved
-intent/answer coverage. Generated repair advice and API/frontend integration
-remain separate work.
+## 6 November continuation
+
+Four fresh full-retrieval paraphrases exercised an explanation, an exact release
+request, a confirmed GPU-fix request and an unrelated question. V3 reached the
+expected broad decisions but generalized the community storage explanation.
+V4 reinforces attribution in the claim itself and missing exact-version limits.
+Rechecking the same saved inputs kept all four routes and produced a claim
+scoped to the specific discussion. The exact-release question still received
+the wrong `confirmed_fix` intent label, even though it was conservatively
+withheld. V4 does not establish corrected intent classification. These are
+reused development inputs, not a
+held-out benchmark. Intermediate labels/limitations still need human review;
+schema/provenance checks cannot establish their semantic correctness.
+
+The UI now opts into `/assess` explicitly. It shows supported scoped claims and
+quotes rather than calling another model to write a troubleshooting answer.
+Independent label review, broader retrieval/intent coverage, citation reachability
+and complete v1 quality acceptance remain open. Current prompt is
+`vita-evidence-v4`; historical v3 results above are not evidence for v4.

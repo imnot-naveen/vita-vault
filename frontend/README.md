@@ -17,19 +17,40 @@ with a standalone static server: `/search` would be unavailable.
 
 Questions, optional model/firmware, and previous tests are joined into one
 retrieval query. These are context, not strict database filters. Nothing is
-persisted by the UI, and it makes no assessor or answer-generation calls.
+persisted by the UI. Source-only search makes no assessor or answer-generation
+calls. Optional experimental evidence review uses `/assess` as described below.
 External fonts and the credited Wikimedia console image need internet access;
 system fonts and the rest of the interface remain usable without them.
 
 Results show original passages, links and available provenance. Identifier
-mentions are not exact setup matches. All candidates remain not assessed; the
-UI cannot claim relevance, sufficient evidence, a verified fix or a diagnosis.
+mentions are not exact setup matches. In source-only mode all candidates remain
+not assessed; source search cannot claim relevance, sufficient evidence, a
+verified fix or a diagnosis.
 Empty retrieval and service failures have separate states. Input changes clear
 old results and abort the browser request, although backend processing may
 finish. Requests time out after 90 seconds. No result is stored across reloads.
 
-The existing separate assessor remains future integration work. The full v1
-insufficient-evidence/answer behavior is not implemented by this source UI.
+## Optional evidence review
+
+Check **Review source evidence with AI** before submitting to retrieve sources
+and review them with the configured free OpenRouter model. This option is off
+by default. Its notice identifies the question, console details and passages
+sent to the provider. Source-only search remains local.
+
+The review panel distinguishes source-supported information with exact quotes,
+related reports with insufficient support, no relevant evidence in the returned
+passages, failed validation and service failure. Source cards retain original
+passages and label the model's relevance/applicability judgments explicitly.
+Provider failure retains readable sources and does not claim evidence is absent.
+Supported claims remain attributed/scoped and preserve limitations. All model
+and source text is rendered literally, without HTML interpretation.
+
+Input/mode/opt-in changes clear results and abort the browser request. Evidence
+review has a 150-second browser timeout; source-only search retains 90 seconds.
+Backend requests may finish after cancellation and occupy the review slot until
+then. No questions/results persist across reloads. Free-form answer generation
+is not implemented; the review is experimental and needs broader evaluation
+before full v1 quality acceptance.
 
 Design: preserve the 30 October prototype’s original PCH-1000 hardware,
 blue/cyan LiveArea, glossy bubbles, scroll motion and reduced-motion support.
