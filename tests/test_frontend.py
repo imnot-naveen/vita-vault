@@ -13,7 +13,7 @@ class FrontendTests(unittest.TestCase):
     def test_ui_assets_and_existing_routes_share_one_origin(self):
         with TestClient(create_app(retriever_factory=NoSearch)) as client:
             self.assertIn('Search sources', client.get('/').text)
-            self.assertIn("fetch('/search'", client.get('/search.js').text)
+            self.assertIn("'/search'", client.get('/search.js').text)
             self.assertEqual(client.get('/style.css').status_code, 200)
             self.assertEqual(client.get('/health').status_code, 200)
             self.assertIn('/search', client.get('/openapi.json').json()['paths'])

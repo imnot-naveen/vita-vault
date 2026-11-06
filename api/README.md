@@ -3,7 +3,8 @@
 A local HTTP interface over the existing read-only retriever. It returns full
 source passages and provenance with an explicit unassessed state. It embeds
 questions locally and queries the configured Qdrant collection; no OpenRouter
-assessment or answer-generation call is made by these endpoints.
+assessment or answer-generation call is made by `/search`. The separate
+`/assess` endpoint explicitly opts into model-assisted evidence review below.
 
 ## Install and run
 
@@ -97,7 +98,47 @@ environment; a full fresh reinstall on another platform is not established.
 
 This completes the source-returning API layer. The separate assessment CLI and
 [evidence-quality limitations](../retrieval/HARD_CASES.md) remain in place.
-The browser UI serves from the same origin at `/`; see `frontend/README.md`. Generated answers and assessment endpoints remain later work.
+The browser UI serves from the same origin at `/`; see `frontend/README.md`.
+Free-form generated troubleshooting answers remain later work.
+
+## POST /assess — experimental evidence review
+
+Accepts the same strict question/limit body as `/search`. Retrieves passages on
+the server, then sends the question and passages to the existing configured
+OpenRouter `:free` model through `retrieval.assessor`. This may include console
+details entered in the question. The browser offers an unchecked opt-in and a
+data-sharing notice; `/search` remains entirely local and never calls this model.
+Use anonymous questions. Run this development server on loopback only; no
+authentication, public hosting, or production traffic controls are provided.
+
+The response contains `retrieval`, `status`, `decision`, and `model_called`.
+The original retrieval remains `not_assessed`; the separate decision describes
+the review of its exact question and passages. No browser-supplied source list
+or review is accepted. Accepted model reviews are bound to server-owned source
+IDs, URLs and passage hashes; scoped permitted claims include exact quotes and
+limitations. Raw provider completions, credentials and intermediate reviews are
+not exposed. No extra answer-generation model call is made.
+
+| HTTP | Review state | Meaning |
+|---|---|---|
+| 200 | `assessed` | Decision is supported information, related reports with insufficient support, or no relevant evidence in the returned passages |
+| 200 | `no_relevant_evidence_retrieved` | No eligible candidates; provider skipped |
+| 200 | `review_required` | Review failed validation; original sources retained, no claims authorized |
+| 503 | `service_error` | Provider/configuration failure; original sources retained when retrieval succeeded |
+| 503 | top-level error | Retrieval unavailable or another review already running |
+| 400/422 | `invalid_input` | Same strict input rules as source search |
+
+Only one evidence review runs at a time in each server process. Further review
+requests fail promptly; local source searches remain available. A browser abort
+does not cancel the backend request. There are no retries, paid fallback or
+index writes. Provider price ceilings remain zero. Empty input/results skip
+the provider. Review or service failure never becomes an insufficient-evidence
+verdict. A schema-valid review can still misinterpret a source: this is an
+experimental aid, not independent verification of a repair.
+
+Seven additional offline HTTP tests cover the positive quote/provenance path,
+distinct evidence states, malformed reviews, redacted errors, provider skips,
+busy review capacity and retrieval failure. The full suite has 52 tests.
 
 Implementation references: [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/),
 [lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/),
