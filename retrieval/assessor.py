@@ -6,7 +6,7 @@ import math
 from retrieval.evidence import decide_evidence, passage_hash
 
 
-PROMPT_VERSION = 'vita-evidence-v3'
+PROMPT_VERSION = 'vita-evidence-v4'
 FUNCTION_NAME = 'review_passages'
 ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 ROW_FIELDS = {'source_index', 'relevance', 'applicability', 'support', 'claim',
@@ -62,7 +62,14 @@ For explanation/documented_guidance/reported_success provide a narrow claim and
 an exact contiguous evidence_quote copied from the passage. Scope claims to what
 the cited discussion establishes. Do not add unstated properties of other
 software or generalize a historical report to all versions. Otherwise leave
-claim and evidence_quote empty. Irrelevant rows must use none, not_applicable
+claim and evidence_quote empty. For a community comment, phrase the claim as an
+attributed account beginning "In this discussion," or "In this report,". A
+commenter describing which storage figure they read does not establish how all
+VitaShell or PKGj screens/versions behave. Keep that distinction in the claim
+itself, not only in limitations. For questions requesting an exact release,
+version or identifier, a passage without that value cannot sufficiently answer
+the request; preserve the missing value in limitations instead of inventing it.
+Irrelevant rows must use none, not_applicable
 and empty claim/quote. Preserve material version/context differences, incomplete
 steps, adverse outcomes and uncertainties in limitations and reason.
 contradicted is true if supplied evidence contradicts the proposed claim or
