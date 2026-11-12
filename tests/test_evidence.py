@@ -86,6 +86,64 @@ class EvidenceTests(unittest.TestCase):
         self.review['requested_support'] = 'reported_remedy'
         self.assertEqual(self.decide()['status'], 'supported_answer')
 
+    def test_retry_only_version_does_not_support_a_release_but_an_explicit_fix_does(self):
+        retry = 'PSP ISO downloads failed with files in wrong order. Retry with PKGj 0.51.'
+        fixed = f'{retry} A later update says fixed in PKGj v0.51.'
+        claim = 'PKGj v0.51 fixed the PSP ISO download error.'
+        self.review['requested_support'] = 'release_identification'
+        self.source['payload']['chunk'] = retry
+        self.assessment.update(support='documented_release', claim=claim, evidence_quote=retry,
+                               passage_sha256=passage_hash(retry))
+        second = deepcopy(self.source)
+        second['point_id'] = 2
+        second['payload'].update(chunk=fixed, url='https://example.com/issue/2')
+        self.retrieval['sources'].append(second)
+        self.review['assessments'].append(self.assessment | {
+            'point_id': 2, 'url': second['payload']['url'], 'evidence_quote': fixed,
+            'passage_sha256': passage_hash(fixed),
+        })
+
+        result = self.decide()
+
+        self.assertEqual(result['status'], 'supported_answer')
+        self.assertEqual([claim['point_id'] for claim in result['permitted_claims']], [2])
+        self.assertEqual(result['related_sources'][0]['support'], 'suggestion_without_outcome')
+
+    def test_future_and_conditional_versions_do_not_establish_a_released_fix(self):
+        planned = "The DLC still fails. Fixed in v0.27 if it's that bug. Will be fixed in v0.28."
+        released = f'{planned} Update after release: fixed in v0.28.'
+        self.review['requested_support'] = 'release_identification'
+        for quote, claim, expected in (
+            (planned, 'PKGj v0.28 fixed the DLC failure.', 'related_reports_insufficient_support'),
+            (planned, 'PKGj v0.27 fixed the DLC failure.', 'related_reports_insufficient_support'),
+            (released, 'PKGj v0.28 will fix the DLC failure.', 'related_reports_insufficient_support'),
+            (released, 'PKGj v0.28 fixed the DLC failure.', 'supported_answer'),
+        ):
+            with self.subTest(claim=claim, quote=quote):
+                self.source['payload']['chunk'] = quote
+                self.assessment.update(support='documented_release', claim=claim, evidence_quote=quote,
+                                       passage_sha256=passage_hash(quote))
+                result = self.decide()
+                self.assertEqual(result['status'], expected)
+                if expected != 'supported_answer':
+                    self.assertEqual(result['permitted_claims'], [])
+
+    def test_predicted_install_is_guidance_and_cannot_prove_reported_success(self):
+        quote = 'Remove work.bin and head.bin from the build, and the VPK will install as normal.'
+        self.source['payload']['chunk'] = quote
+        self.assessment.update(claim='The report advises omitting work.bin and head.bin from the build.',
+                               evidence_quote=quote, passage_sha256=passage_hash(quote))
+
+        self.review['requested_support'] = 'reported_remedy'
+        self.assessment['support'] = 'reported_success'
+        result = self.decide()
+        self.assertEqual(result['status'], 'review_required')
+        self.assertEqual(result['permitted_claims'], [])
+
+        self.review['requested_support'] = 'guidance'
+        self.assessment['support'] = 'documented_guidance'
+        self.assertEqual(self.decide()['status'], 'supported_answer')
+
     def test_conflicting_report_blocks_answer_permission(self):
         second = deepcopy(self.source)
         second['point_id'] = 2

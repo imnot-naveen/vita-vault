@@ -120,7 +120,7 @@
    no_relevant_evidence_retrieved: 'No relevant evidence in these results', review_required: 'Evidence review needs another check', service_error: 'Evidence review is unavailable'};
   const panel = element('section', undefined, 'evidence-panel');
   const messages = {supported_answer: 'These passages support the statements below within the circumstances described.',
-   related_reports_insufficient_support: 'We found similar reports, but they do not establish an answer for your situation.',
+   related_reports_insufficient_support: decision.message,
    no_relevant_evidence_retrieved: 'No relevant evidence was found in these retrieved passages. This search does not cover every source.',
    review_required: 'We couldn’t validate this review. Read the original passages or try again.',
    service_error: 'We couldn’t complete the evidence review. The retrieved passages are still available to read.'};

@@ -47,6 +47,127 @@ class AssessmentAPITests(unittest.TestCase):
         self.assertNotIn('review', result)
         self.assertNotIn('usage', result)
 
+    def test_release_lookup_requires_a_quoted_version_and_exact_error(self):
+        self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
+        self.fixture.output['requested_support'] = 'release_identification'
+        claim = 'The release note lists Adrenaline v99.2 as the release that fixes C1-2858-3.'
+        cases = (
+            ('matching release', 'Adrenaline v99.2 release notes: fixed C1-2858-3.', 'supported_answer'),
+            ('different error', 'Adrenaline v99.2 release notes: fixed C1-2758-2.', 'review_required'),
+            ('different version', 'Adrenaline v99.1 release notes: fixed C1-2858-3.', 'review_required'),
+            ('commit only', 'Commit a1b2c3d fixed Adrenaline error C1-2858-3.', 'review_required'),
+        )
+        source = self.retrieval['sources'][0]['payload']
+        for name, passage, expected in cases:
+            with self.subTest(name=name):
+                source['chunk'] = passage
+                self.fixture.output['assessments'][0].update(
+                    support='documented_release', claim=claim, evidence_quote=passage,
+                    reason='The release note supplies the version and error.',
+                )
+                provider = fixtures.FakeClient(self.fixture.response())
+                with TestClient(self.app(provider)) as client:
+                    response = client.post('/assess', json={'question': self.retrieval['question']})
+                self.assertEqual(response.status_code, 200)
+                decision = response.json()['decision']
+                self.assertEqual(decision['status'], expected)
+                if expected == 'supported_answer':
+                    self.assertEqual(len(decision['permitted_claims']), 1)
+                    release = decision['permitted_claims'][0]
+                    self.assertEqual(release['support'], 'documented_release')
+                    self.assertEqual(release['claim'], claim)
+                    self.assertEqual(release['evidence_quote'], passage)
+                    self.assertEqual(release['url'], source['url'])
+                else:
+                    self.assertEqual(decision['permitted_claims'], [])
+
+    def test_release_lookup_extracts_and_validates_the_span_between_excerpts(self):
+        self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
+        self.fixture.output['requested_support'] = 'release_identification'
+        start = 'Firmware 3.65, error C1-2858-3'
+        end = 'Fixed in v99.2.'
+        span = f'{start}. Several comments discussed the launch failure. {end}'
+        passage = f'Adrenaline issue. {span} Thanks for the update.'
+        cases = (
+            ('matching span', passage, start, end, span),
+            ('missing opening', passage, 'Opening from another issue', end, None),
+            ('missing ending', passage, start, 'Fixed in v99.1.', None),
+            ('reversed excerpts', f'{end} Earlier report: {start}.', start, end, None),
+            ('ambiguous opening', f'{start}. Then: {span}', start, end, None),
+            ('missing firmware', passage, 'error C1-2858-3', end, None),
+        )
+        for name, source_text, opening, ending, expected_quote in cases:
+            with self.subTest(name=name):
+                self.retrieval['sources'][0]['payload']['chunk'] = source_text
+                self.fixture.output['assessments'][0].update(
+                    support='documented_release',
+                    claim='Adrenaline v99.2 fixes C1-2858-3 on firmware 3.65.',
+                    evidence_start=opening, evidence_quote=ending,
+                    reason='The issue report records the error and the released fix.',
+                )
+                provider = fixtures.FakeClient(self.fixture.response())
+                with TestClient(self.app(provider)) as client:
+                    response = client.post('/assess', json={'question': self.retrieval['question']})
+                self.assertEqual(response.status_code, 200)
+                decision = response.json()['decision']
+                if expected_quote is None:
+                    self.assertEqual(decision['status'], 'review_required')
+                    self.assertEqual(decision['permitted_claims'], [])
+                else:
+                    self.assertEqual(decision['status'], 'supported_answer')
+                    self.assertEqual(decision['permitted_claims'][0]['evidence_quote'], expected_quote)
+
+    def test_commit_mislabeled_as_release_preserves_related_source_without_a_claim(self):
+        self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
+        source = self.retrieval['sources'][0]['payload']
+        start = 'Downloading a demo v1.0 asset triggered error C1-2858-3.'
+        end = 'Adrenaline commit a1b2c3d fixes the download.'
+        source['chunk'] = f'{start} Discussion followed. {end}'
+        self.fixture.output['requested_support'] = 'release_identification'
+        self.fixture.output['assessments'][0].update(
+            support='documented_release', claim='Adrenaline commit a1b2c3d fixes C1-2858-3.',
+            evidence_start=start, evidence_quote=end, reason='The source identifies the fixing commit.',
+        )
+        provider = fixtures.FakeClient(self.fixture.response())
+        with TestClient(self.app(provider)) as client:
+            response = client.post('/assess', json={'question': self.retrieval['question']})
+
+        self.assertEqual(response.status_code, 200)
+        decision = response.json()['decision']
+        self.assertEqual(decision['status'], 'related_reports_insufficient_support')
+        self.assertEqual(decision['message'], "The retrieved sources don't identify an installable release.")
+        self.assertEqual(decision['permitted_claims'], [])
+        self.assertEqual(decision['related_sources'][0]['url'], source['url'])
+        self.assertEqual(decision['related_sources'][0]['support'], 'none')
+
+    def test_cross_source_release_quote_cannot_discard_an_independent_valid_citation(self):
+        self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
+        first = self.retrieval['sources'][0]
+        opening = 'Error C1-2858-3 appears when launching Adrenaline.'
+        first['payload']['chunk'] = f'{opening} Retry with v99.2.'
+        second = deepcopy(first)
+        second['point_id'] = 2
+        fixed = 'Adrenaline release v99.2 fixed C1-2858-3.'
+        second['payload'].update(url='https://example.com/issue/2', chunk=fixed)
+        self.retrieval['sources'].append(second)
+        self.fixture.output['requested_support'] = 'release_identification'
+        row = self.fixture.output['assessments'][0]
+        row.update(support='documented_release', claim='Adrenaline v99.2 fixed C1-2858-3.',
+                   evidence_start=opening, evidence_quote=fixed, reason='The release addresses the error.')
+        self.fixture.output['assessments'].append(row | {
+            'source_index': 1, 'evidence_start': '', 'evidence_quote': fixed,
+        })
+        provider = fixtures.FakeClient(self.fixture.response())
+
+        with TestClient(self.app(provider)) as client:
+            response = client.post('/assess', json={'question': self.retrieval['question']})
+
+        self.assertEqual(response.status_code, 200)
+        decision = response.json()['decision']
+        self.assertEqual(decision['status'], 'supported_answer')
+        self.assertEqual([claim['point_id'] for claim in decision['permitted_claims']], [2])
+        self.assertEqual(decision['related_sources'][0]['support'], 'none')
+
     def test_provider_failure_retains_sources_and_redacts_private_details(self):
         for error in [AssessorUnavailable('secret-provider-body'), RuntimeError('secret-provider-body')]:
             with self.subTest(error=type(error).__name__):
