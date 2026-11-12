@@ -69,7 +69,7 @@ class RelatedSource(BaseModel):
     title: str
     relevance: Literal['direct', 'related']
     applicability: Literal['matching', 'mismatch', 'unknown']
-    support: Literal['explanation', 'documented_guidance', 'reported_success',
+    support: Literal['explanation', 'documented_guidance', 'documented_release', 'reported_success',
                      'suggestion_without_outcome', 'symptoms_only', 'none']
     reason: str
     limitations: list[str]

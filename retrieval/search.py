@@ -12,14 +12,14 @@ from urllib.parse import urlsplit
 from qdrant_client import QdrantClient, models
 
 import config
+from retrieval.identifiers import error_codes
 
 # BAAI's short-query-to-passage instruction; passages remain unprefixed.
 QUERY_PREFIX = 'Represent this sentence for searching relevant passages: '
-ERROR_CODE = re.compile(r'\b(?:0x[0-9a-f]{8}|[a-z]\d-\d{4,5}-\d)\b', re.IGNORECASE)
 
 
 def query_identifiers(question):
-    codes = {m.group().lower() for m in ERROR_CODE.finditer(question)}
+    codes = error_codes(question)
     firmware = set(re.findall(r'\b(?:firmware|fw)\s*(?:version\s*)?[:=]?\s*(3\.\d{2})\b', question, re.IGNORECASE))
     return sorted(codes | firmware)
 

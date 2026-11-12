@@ -50,6 +50,75 @@ class AssessorTests(unittest.TestCase):
         self.assertNotIn('secret_metadata', result['usage'])
         self.assertEqual(len(client.requests), 1)
 
+    def test_model_limitations_must_come_from_the_source_passage(self):
+        caveat = 'I only checked one VitaShell version.'
+        self.retrieval['sources'][0]['payload']['chunk'] += ' ' + caveat
+        self.output['assessments'][0]['limitations'] = [
+            caveat, 'An interrupted download could have caused filesystem inconsistency.',
+        ]
+
+        result = assess_evidence(self.retrieval, FakeClient(self.response()))
+        self.assertEqual(result['decision']['status'], 'supported_answer')
+        self.assertEqual(result['decision']['permitted_claims'][0]['limitations'], [caveat])
+        self.assertEqual(result['decision']['related_sources'][0]['limitations'], [caveat])
+
+    def test_release_lookup_with_only_a_fixing_commit(self):
+        self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
+        self.retrieval['sources'][0]['payload'].update(
+            title='Adrenaline issue discussion',
+            chunk='Adrenaline error C1-2858-3 was fixed in commit a1b2c3d.',
+        )
+        self.output['requested_support'] = 'release_identification'
+        self.output['assessments'][0].update(
+            relevance='related', applicability='unknown', support='none',
+            claim='', evidence_quote='', reason='The passage identifies only the fixing commit.',
+        )
+
+        client = FakeClient(self.response())
+        result = assess_evidence(self.retrieval, client)
+
+        parameters = client.requests[0]['tools'][0]['function']['parameters']
+        self.assertIn('release_identification', parameters['properties']['requested_support']['enum'])
+        self.assertEqual(result['status'], 'assessed')
+        self.assertEqual(result['review']['requested_support'], 'release_identification')
+        decision = result['decision']
+        self.assertEqual(decision['status'], 'related_reports_insufficient_support')
+        self.assertEqual(decision['message'], "The retrieved sources don't identify an installable release.")
+        self.assertEqual(decision['permitted_claims'], [])
+        self.assertEqual(decision['related_sources'][0]['point_id'], 'source-uuid')
+
+    def test_tool_schema_requires_one_row_for_each_passage(self):
+        second_source = deepcopy(self.retrieval['sources'][0])
+        second_source['point_id'] = 2
+        self.retrieval['sources'].append(second_source)
+
+        request = build_request(self.retrieval)
+        fields = request['tools'][0]['function']['parameters']['properties']['assessments']
+        self.assertEqual(fields['minItems'], 2)
+        self.assertEqual(fields['maxItems'], 2)
+        self.assertEqual(fields['items']['properties']['source_index']['maximum'], 1)
+
+        for name, rows in (
+            ('missing row', self.output['assessments']),
+            ('duplicate index', self.output['assessments'] * 2),
+        ):
+            with self.subTest(name=name):
+                output = self.output | {'assessments': rows}
+                result = assess_evidence(self.retrieval, FakeClient(self.response(output)))
+                self.assertEqual(result['status'], 'review_required')
+                self.assertEqual(result['decision']['permitted_claims'], [])
+
+    def test_unusable_applicability_on_a_relevant_row_never_establishes_a_match(self):
+        self.output['assessments'][0]['applicability'] = 'not_applicable'
+
+        result = assess_evidence(self.retrieval, FakeClient(self.response()))
+
+        self.assertEqual(result['status'], 'assessed')
+        decision = result['decision']
+        self.assertEqual(decision['status'], 'related_reports_insufficient_support')
+        self.assertEqual(decision['related_sources'][0]['applicability'], 'unknown')
+        self.assertEqual(decision['permitted_claims'], [])
+
     def test_no_candidates_and_operational_states_do_not_call_provider(self):
         for state in ('no_candidates', 'invalid_input', 'service_error'):
             client = FakeClient(self.response())

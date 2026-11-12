@@ -3,21 +3,37 @@
 import hashlib
 import re
 
+from retrieval.identifiers import RELEASE_VERSION, error_codes, release_versions
+
 
 ALLOWED_SUPPORT = {
     'explanation': {'explanation'},
     'guidance': {'documented_guidance', 'reported_success'},
     'reported_remedy': {'reported_success'},
+    'release_identification': {'documented_release'},
     # Community passages and reviewer labels do not independently confirm a fix.
     'confirmed_fix': set(),
 }
-SUPPORT = {'explanation', 'documented_guidance', 'reported_success',
+SUPPORT = {'explanation', 'documented_guidance', 'documented_release', 'reported_success',
            'suggestion_without_outcome', 'symptoms_only', 'none'}
 NOTICE = ('This decision enforces supplied reviews. It does not independently '
           'verify their meaning, source reliability, or a repair outcome.')
 # Narrow English-language checks for observed failure modes, not an entailment
 # classifier. Mixed quotes may require a narrower outcome quote or manual review.
-TENTATIVE_OUTCOME = re.compile(r'\b(?:should|might|may|could|would)\s+(?:\w+\s+){0,2}(?:work|help|fix|solve|resolve)\b', re.I)
+TENTATIVE_OUTCOME = re.compile(
+    r'\b(?:should|might|may|could|would|will)\s+(?:\w+\s+){0,2}'
+    r'(?:work|help|fix|solve|resolve|install|download|launch)\b', re.I,
+)
+UNCONFIRMED_RELEASE = re.compile(
+    r'\b(?:(?:try|retry)\s+(?:[\w-]+\s+){0,5}'
+    r'|(?:will|should|might|may|could|would)\s+be\s+(?:fixed|resolved|addressed)\s+in\s+)'
+    + RELEASE_VERSION.pattern, re.I,
+)
+CONDITIONAL_RELEASE = re.compile(
+    r'\b(?:fixed|resolved|addressed)\s+in\s+' + RELEASE_VERSION.pattern
+    + r"(?=\s+if\s+(?:it's|it is|that's|that is)\s+(?:that|the same)\s+(?:bug|issue|problem)\b)",
+    re.I,
+)
 WITHDRAWN_OUTCOME = re.compile(r'\b(?:withdraw|withdrawn|retract|retracted)\b|\bproblem\s+persists\b|\b(?:crashed|failed)\s+again\b', re.I)
 
 
@@ -77,6 +93,7 @@ def decide_evidence(retrieval, review):
         requested = review.get('requested_support')
         if not isinstance(requested, str) or requested not in ALLOWED_SUPPORT:
             raise ValueError('Review must specify a supported requested_support kind.')
+        requested_codes = error_codes(question) if requested == 'release_identification' else set()
         rows = review.get('assessments')
         if not isinstance(rows, list):
             raise ValueError('Review assessments must be a list.')
@@ -118,17 +135,30 @@ def decide_evidence(retrieval, review):
             if not isinstance(support, str) or support not in SUPPORT:
                 raise ValueError('Invalid support label.')
             limitations = assessment.get('limitations')
+            reason = assessment.get('reason')
             if (not isinstance(limitations, list) or not all(_text(x) for x in limitations)
-                    or not _text(assessment.get('reason'))
+                    or not _text(reason)
                     or type(assessment.get('contradicted')) is not bool):
                 raise ValueError('Each review needs a reason, limitations list and Boolean contradicted field.')
             quote = assessment.get('evidence_quote', '')
             claim = assessment.get('claim', '')
             if not isinstance(quote, str) or not isinstance(claim, str):
                 raise ValueError('Claim and evidence_quote must be strings.')
-            if support in {'explanation', 'documented_guidance', 'reported_success'}:
+            if support in {'explanation', 'documented_guidance', 'documented_release', 'reported_success'}:
                 if not _text(claim) or not _text(quote) or quote not in payload['chunk']:
                     raise ValueError('Positive support needs a scoped claim and a verbatim passage quote.')
+            if support == 'documented_release':
+                claimed_versions = release_versions(claim)
+                release_quote = CONDITIONAL_RELEASE.sub(' ', UNCONFIRMED_RELEASE.sub(' ', quote))
+                if not claimed_versions:
+                    support = 'none'
+                    reason = 'The review did not establish an installable release version.'
+                elif (not claimed_versions <= release_versions(quote)
+                      or not (requested_codes | error_codes(claim)) <= error_codes(quote)):
+                    raise ValueError('A release claim needs its version and exact error in the evidence quote.')
+                elif TENTATIVE_OUTCOME.search(claim) or not claimed_versions <= release_versions(release_quote):
+                    support = 'suggestion_without_outcome'
+                    reason = 'The review offers a suggested or planned fix without documenting a released fix.'
             if support == 'reported_success':
                 if TENTATIVE_OUTCOME.search(quote):
                     raise ValueError('A tentative prediction in a success quote requires review; it is not an observed outcome.')
@@ -143,7 +173,7 @@ def decide_evidence(retrieval, review):
             item = {'point_id': source['point_id'], 'url': payload['url'],
                     'title': payload.get('title', ''), 'relevance': relevance,
                     'applicability': applicability, 'support': support,
-                    'reason': assessment['reason'], 'limitations': list(limitations)}
+                    'reason': reason, 'limitations': list(limitations)}
             related.append(item)
             conflict = conflict or assessment['contradicted']
             if (relevance == 'direct' and applicability == 'matching'
@@ -159,10 +189,13 @@ def decide_evidence(retrieval, review):
             return result('supported_answer', 'Only the listed scoped claims are permitted.',
                           permitted_claims=permitted, related_sources=related)
         if related:
-            message = ("I couldn't find a confirmed fix for your exact situation in the sources retrieved."
-                       if requested == 'confirmed_fix' else
-                       'Related reports were retrieved, but they do not sufficiently support '
-                       'the requested answer under the supplied reviews.')
+            if requested == 'release_identification':
+                message = "The retrieved sources don't identify an installable release."
+            elif requested == 'confirmed_fix':
+                message = "I couldn't find a confirmed fix for your exact situation in the sources retrieved."
+            else:
+                message = ('Related reports were retrieved, but they do not sufficiently support '
+                           'the requested answer under the supplied reviews.')
             return result('related_reports_insufficient_support', message,
                           related_sources=related, conflicting_evidence=conflict)
         return result('no_relevant_evidence_retrieved',
