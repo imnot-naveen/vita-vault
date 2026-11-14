@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 from fastapi.testclient import TestClient
 from api.main import create_app
-from retrieval.assessor import AssessorUnavailable
+from retrieval.assessor import AssessorUnavailable, parse_review
 import test_assessor as fixtures
 
 
@@ -89,14 +89,22 @@ class AssessmentAPITests(unittest.TestCase):
         span = f'{start}. Several comments discussed the launch failure. {end}'
         passage = f'Adrenaline issue. {span} Thanks for the update.'
         cases = (
-            ('matching span', passage, start, end, span),
-            ('missing opening', passage, 'Opening from another issue', end, None),
-            ('missing ending', passage, start, 'Fixed in v99.1.', None),
-            ('reversed excerpts', f'{end} Earlier report: {start}.', start, end, None),
-            ('ambiguous opening', f'{start}. Then: {span}', start, end, None),
-            ('missing firmware', passage, 'error C1-2858-3', end, None),
+            ('matching span', passage, start, end, span, None),
+            ('missing opening', passage, 'Opening from another issue', end, None,
+             'opening release excerpt is missing'),
+            ('missing ending', passage, start, 'Fixed in v99.1.', None,
+             'ending release excerpt is missing'),
+            ('reversed excerpts', f'{end} Earlier report: {start}.', start, end, None,
+             'ending release excerpt must follow'),
+            ('ambiguous opening', f'{start}. Then: {span}', start, end, None,
+             'opening release excerpt appears more than once'),
+            ('ambiguous ending', f'{passage} Repeated note: {end}', start, end, None,
+             'ending release excerpt appears more than once'),
+            ('overlapping excerpts', passage, start, 'error C1-2858-3', None,
+             'ending release excerpt must follow'),
+            ('missing firmware', passage, 'error C1-2858-3', end, None, None),
         )
-        for name, source_text, opening, ending, expected_quote in cases:
+        for name, source_text, opening, ending, expected_quote, expected_error in cases:
             with self.subTest(name=name):
                 self.retrieval['sources'][0]['payload']['chunk'] = source_text
                 self.fixture.output['assessments'][0].update(
@@ -113,6 +121,9 @@ class AssessmentAPITests(unittest.TestCase):
                 if expected_quote is None:
                     self.assertEqual(decision['status'], 'review_required')
                     self.assertEqual(decision['permitted_claims'], [])
+                    if expected_error is not None:
+                        with self.assertRaisesRegex(ValueError, expected_error):
+                            parse_review(self.retrieval, self.fixture.response())
                 else:
                     self.assertEqual(decision['status'], 'supported_answer')
                     self.assertEqual(decision['permitted_claims'][0]['evidence_quote'], expected_quote)

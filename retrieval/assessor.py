@@ -235,9 +235,16 @@ def _release_quote_span(passage, start, end):
         raise ValueError('Release evidence needs nonempty opening and ending excerpts.')
     start_index = passage.find(start)
     end_index = passage.find(end)
-    if (start_index < 0 or end_index < start_index + len(start)
-            or passage.rfind(start) != start_index or passage.rfind(end) != end_index):
-        raise ValueError('Release evidence excerpts must occur once, in order, in the same passage.')
+    if start_index < 0:
+        raise ValueError('The opening release excerpt is missing from the source passage.')
+    if end_index < 0:
+        raise ValueError('The ending release excerpt is missing from the source passage.')
+    if passage.rfind(start) != start_index:
+        raise ValueError('The opening release excerpt appears more than once in the source passage.')
+    if passage.rfind(end) != end_index:
+        raise ValueError('The ending release excerpt appears more than once in the source passage.')
+    if end_index < start_index + len(start):
+        raise ValueError('The ending release excerpt must follow the opening excerpt without overlap.')
     return passage[start_index:end_index + len(end)]
 
 
