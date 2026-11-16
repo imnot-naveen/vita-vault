@@ -243,9 +243,14 @@ def _release_quote_span(passage, start, end):
         raise ValueError('The opening release excerpt appears more than once in the source passage.')
     if passage.rfind(end) != end_index:
         raise ValueError('The ending release excerpt appears more than once in the source passage.')
-    if end_index < start_index + len(start):
+    start_end = start_index + len(start)
+    end_end = end_index + len(end)
+    # The model sometimes repeats the final sentence of a complete opening quote.
+    if start_index < end_index and end_end == start_end:
+        return passage[start_index:start_end]
+    if end_index < start_end:
         raise ValueError('The ending release excerpt must follow the opening excerpt without overlap.')
-    return passage[start_index:end_index + len(end)]
+    return passage[start_index:end_end]
 
 
 def parse_review(retrieval, response):

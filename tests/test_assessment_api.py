@@ -90,6 +90,8 @@ class AssessmentAPITests(unittest.TestCase):
         passage = f'Adrenaline issue. {span} Thanks for the update.'
         cases = (
             ('matching span', passage, start, end, span, None),
+            ('complete opening with redundant ending', passage, span, end, span, None),
+            ('redundant ending without release', passage, start, 'error C1-2858-3', None, None),
             ('missing opening', passage, 'Opening from another issue', end, None,
              'opening release excerpt is missing'),
             ('missing ending', passage, start, 'Fixed in v99.1.', None,
@@ -100,7 +102,7 @@ class AssessmentAPITests(unittest.TestCase):
              'opening release excerpt appears more than once'),
             ('ambiguous ending', f'{passage} Repeated note: {end}', start, end, None,
              'ending release excerpt appears more than once'),
-            ('overlapping excerpts', passage, start, 'error C1-2858-3', None,
+            ('overlapping excerpts', passage, start, 'error C1-2858-3. Several comments', None,
              'ending release excerpt must follow'),
             ('missing firmware', passage, 'error C1-2858-3', end, None, None),
         )
