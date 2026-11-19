@@ -6,7 +6,7 @@ import math
 from retrieval.evidence import ALLOWED_SUPPORT, SUPPORT, decide_evidence, passage_hash
 
 
-PROMPT_VERSION = 'vita-evidence-v12'
+PROMPT_VERSION = 'vita-evidence-v17'
 FUNCTION_NAME = 'review_passages'
 ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 ROW_FIELDS = {'source_index', 'relevance', 'applicability', 'support', 'claim',
@@ -30,6 +30,9 @@ when the requested answer is the installable version or release that contains
 a fix, change, or feature; confirmed_fix only when the user explicitly asks for
 a confirmed/verified fix for their exact situation.
 Choose release_identification for "Which installable release fixed this error?"
+and for "Which release did the reporter confirm fixed this error?" In both
+questions the answer is a version. Use reported_remedy when the answer is
+whether someone observed a remedy work.
 A version mentioned as setup context does not make the question a release lookup.
 Use guidance for a question asking which files to omit, which command to run,
 or what the source advised. "What files did the report say to omit from the
@@ -37,6 +40,12 @@ build?" is guidance. "Did someone omit those files and install successfully?"
 is reported_remedy. The word report in a question does not indicate an outcome.
 Classify the question before reviewing the passages.
 Do not turn ordinary requests for help into demands for independent confirmation.
+
+Use one continuous verbatim evidence_quote for reported_success, guidance, and
+explanations. Copy the action and its actual outcome together for a remedy.
+Omit evidence_start from every row except a documented_release row answering a
+release lookup. An opening excerpt on any other support label invalidates the
+whole review. Before calling the tool, check that each row follows this rule.
 
 relevance: direct when the passage addresses the requested question or scoped
 claim; related for similar symptoms, a different operation/error/version, or
@@ -59,18 +68,27 @@ GPU-crash fix even if both appear in the title.
 A different error code or trigger does not establish the requested remedy.
 For release_identification, use documented_release only if the passage explicitly
 ties an installable release of the requested product to the requested fix,
-change, or feature. State the release version in the claim. The evidence must
-include the version, exact requested error code, and any firmware or other version
-named in the claim.
-When those details are far apart, copy two short, unique excerpts from the same
-passage: put the first in evidence_start and the last in evidence_quote. The
-application will extract the full verbatim span between them. Both excerpts
-must be copied from the same source_index. For example, if the
-passage begins "Firmware 3.74, error C1-1234-5" and later ends "Fixed in v9.1",
-use those as evidence_start and evidence_quote respectively. Do not return only
-the final release sentence when it omits the requested error or claimed firmware.
-When one short excerpt covers all the details, put it in evidence_quote and omit
-evidence_start. Leave evidence_start unset or empty for other support labels.
+change, or feature. A reply confirming that the named version fixed the issue
+can establish a scoped documented_release claim. Use documented_release for that
+release answer even when the evidence is a user's report. A suggestion to try the
+version by itself does not establish a fix.
+Choose a quote that connects the reported problem to the named release. If the
+fix is established by a confirming reply, include that reply. When the reply
+or suggestion refers to "this issue" or "this bug", include the earlier text
+that identifies the problem. In the claim, name the release that fixed the
+problem. Put background versions in reason instead of claim unless needed to
+state the answer's scope, such as an explicitly requested firmware version.
+For example, if a report says Bluetooth failed on v2.1 and a later reply confirms
+it works on v2.2, the claim is "In this report, v2.2 fixed the Bluetooth issue."
+Quote from the Bluetooth report through the confirmation. Include each version
+and error code in the claim and the exact requested error code in the quote.
+Prefer one continuous verbatim quote in evidence_quote, with evidence_start
+omitted, even if the quote spans several sentences. If the supporting text is
+far apart, copy a short, unique opening excerpt where the problem is identified
+into evidence_start and a short, unique ending excerpt from the same passage
+into evidence_quote. The ending must start after the opening ends. The
+application will extract the full verbatim span between them. Leave
+evidence_start unset or empty for other support labels.
 A fixing commit alone, a version for a different error or product, and a version
 mentioned only as setup context do not establish the requested release.
 A release tag in a link to the file the app was trying to download describes
@@ -85,16 +103,20 @@ Each citation must independently
 support its claim. A documented fix in one passage does not turn a recommendation
 in another into evidence of a fix.
 reported_success is a scoped self-report, never a guaranteed repair.
-reported_success requires an explicit observation that a change was performed
-and the problem improved/resolved during a stated test or use. "Should work",
-"try this", "might help", and "will install as normal" are predictions or
-recommendations, not observations of success. A passage admitting no confirmation must not receive reported_success,
-even if its setup/error matches exactly. Use suggestion_without_outcome instead.
-Failures, recurrences and withdrawals are not reported_success either: classify
-them as symptoms_only or explanation as appropriate, and flag material conflicts
-against the earlier claimed outcome. A negative finding about a remedy is not
-itself a successful remedy. If both suggestion and an actual outcome exist,
-quote the observed outcome itself and preserve the surrounding limitations.
+Use reported_success only when the passage reports that someone performed
+the action and explicitly links that action to improvement of the problem asked
+about. For a question naming a specific action, both the action and its result
+must match. Quote the action and its observed result together in one contiguous
+excerpt, with any material limits preserved.
+"Should work", "try this", "might help", and "will install as normal" are
+suggestions without an observed outcome. Use suggestion_without_outcome when
+the action was proposed but no successful result was attributed to it, even
+if the issue later went away on its own. An action that helped a different
+problem or merely preceded recovery does not qualify. Put these facts in reason
+without writing a claim labeled reported_success. Use symptoms_only when the
+passage describes the problem or recovery without an applicable remedy or advice.
+For failures, recurrences and withdrawals, flag material conflicts against
+the earlier claimed outcome.
 symptoms_only means the passage describes relevant symptoms but establishes no
 explanation, guidance or successful remedy for the requested claim.
 
@@ -129,10 +151,13 @@ def _schema(source_count):
         'source_index': {'type': 'integer', 'minimum': 0, 'maximum': source_count - 1},
         'relevance': enum(['direct', 'related', 'irrelevant']),
         'applicability': enum(['matching', 'mismatch', 'unknown', 'not_applicable']),
-        'support': enum(sorted(SUPPORT)),
+        'support': enum(sorted(SUPPORT)) | {'description': (
+            'For release_identification, use documented_release for a named release tied to the fix, '
+            'including an attributed confirmation that the named release worked.'
+        )},
         'claim': {'type': 'string'}, 'evidence_quote': {'type': 'string'},
         'evidence_start': {'type': 'string', 'description': (
-            'Optional opening excerpt for documented_release. With this field, '
+            'Omit unless support is documented_release for a release lookup. With this field, '
             'evidence_quote is the ending excerpt from the same passage.'
         )},
         'contradicted': {'type': 'boolean'}, 'reason': {'type': 'string'},
@@ -141,8 +166,9 @@ def _schema(source_count):
     return {'type': 'object', 'additionalProperties': False,
             'properties': {
                 'requested_support': enum(list(ALLOWED_SUPPORT)) | {'description': (
-                    'Classify the question. Requests for what a source says to do use guidance. '
-                    'Requests for an observed successful result use reported_remedy.'
+                    'Classify what the answer should provide. Use release_identification when it should '
+                    'name an installable version, including one a reporter confirmed. Use reported_remedy '
+                    'when it should say whether a remedy worked, and guidance for what a source says to do.'
                 )},
                 'assessments': {'type': 'array', 'minItems': source_count, 'maxItems': source_count,
                                 'items': {'type': 'object', 'properties': fields,
@@ -245,9 +271,11 @@ def _release_quote_span(passage, start, end):
         raise ValueError('The ending release excerpt appears more than once in the source passage.')
     start_end = start_index + len(start)
     end_end = end_index + len(end)
-    # The model sometimes repeats the final sentence of a complete opening quote.
+    # A complete quote may repeat its exact prefix or suffix in the other field.
     if start_index < end_index and end_end == start_end:
         return passage[start_index:start_end]
+    if start_index == end_index and start_end < end_end:
+        return passage[end_index:end_end]
     if end_index < start_end:
         raise ValueError('The ending release excerpt must follow the opening excerpt without overlap.')
     return passage[start_index:end_end]

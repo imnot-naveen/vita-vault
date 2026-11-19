@@ -34,6 +34,12 @@ CONDITIONAL_RELEASE = re.compile(
     + r"(?=\s+if\s+(?:it's|it is|that's|that is)\s+(?:that|the same)\s+(?:bug|issue|problem)\b)",
     re.I,
 )
+SPONTANEOUS_RECOVERY = re.compile(
+    r"\b(?:(?P<negation>never|not|[a-z]+n['’]t)"
+    r'(?:(?:\s+)(?:actually|completely|entirely|fully|really|spontaneously)){0,2}\s+)?'
+    r'(?:(?:fixed|resolved|corrected)\s+itself'
+    r'|(?:went away|cleared up|resumed|started working)\s+on its own)\b', re.I,
+)
 WITHDRAWN_OUTCOME = re.compile(r'\b(?:withdraw|withdrawn|retract|retracted)\b|\bproblem\s+persists\b|\b(?:crashed|failed)\s+again\b', re.I)
 
 
@@ -164,6 +170,9 @@ def decide_evidence(retrieval, review):
                     raise ValueError('A tentative prediction in a success quote requires review; it is not an observed outcome.')
                 if not assessment['contradicted'] and WITHDRAWN_OUTCOME.search(quote):
                     raise ValueError('A withdrawn or recurring outcome cannot be labeled uncontradicted success.')
+                if any(match['negation'] is None for match in SPONTANEOUS_RECOVERY.finditer(quote)):
+                    support = 'symptoms_only'
+                    reason = 'The quoted recovery was reported as spontaneous.'
             if relevance == 'irrelevant':
                 if support != 'none' or applicability != 'not_applicable' or claim.strip():
                     raise ValueError('Irrelevant passages cannot carry a supported claim.')

@@ -47,6 +47,43 @@ class AssessmentAPITests(unittest.TestCase):
         self.assertNotIn('review', result)
         self.assertNotIn('usage', result)
 
+    def test_reported_remedy_requires_more_than_spontaneous_recovery(self):
+        question = 'Did updating iTLS-Enso restore PKGj background downloads?'
+        self.retrieval['question'] = question
+        self.fixture.output['requested_support'] = 'reported_remedy'
+        advice = 'Try the latest iTLS-Enso with rest-mode downloads.'
+        spontaneous = 'The background download issue seemingly fixed itself after about nine days.'
+        observed = 'I updated iTLS-Enso, and that restored my background downloads.'
+        observed_claim = 'The reporter said updating iTLS-Enso restored background downloads.'
+        cases = (
+            (spontaneous, 'The report says downloads recovered on their own.',
+             'related_reports_insufficient_support', 'symptoms_only'),
+            (observed, observed_claim, 'supported_answer', 'reported_success'),
+            (f'The issue never fixed itself. {observed}', observed_claim,
+             'supported_answer', 'reported_success'),
+            (f'The issue had not spontaneously resolved itself. {observed}', observed_claim,
+             'supported_answer', 'reported_success'),
+        )
+        for quote, claim, expected_status, expected_support in cases:
+            with self.subTest(quote=quote):
+                self.retrieval['sources'][0]['payload']['chunk'] = f'{advice} {quote}'
+                self.fixture.output['assessments'][0].update(
+                    support='reported_success', claim=claim, evidence_quote=quote,
+                    reason='The comment describes the result.',
+                )
+                provider = fixtures.FakeClient(self.fixture.response())
+                with TestClient(self.app(provider)) as client:
+                    response = client.post('/assess', json={'question': question})
+
+                self.assertEqual(response.status_code, 200)
+                decision = response.json()['decision']
+                self.assertEqual(decision['status'], expected_status)
+                self.assertEqual(decision['related_sources'][0]['support'], expected_support)
+                if expected_support == 'reported_success':
+                    self.assertEqual(decision['permitted_claims'][0]['evidence_quote'], quote)
+                else:
+                    self.assertEqual(decision['permitted_claims'], [])
+
     def test_release_lookup_requires_a_quoted_version_and_exact_error(self):
         self.retrieval['question'] = 'Which installable Adrenaline release fixed error C1-2858-3?'
         self.fixture.output['requested_support'] = 'release_identification'
@@ -91,6 +128,7 @@ class AssessmentAPITests(unittest.TestCase):
         cases = (
             ('matching span', passage, start, end, span, None),
             ('complete opening with redundant ending', passage, span, end, span, None),
+            ('complete ending with redundant opening', passage, start, span, span, None),
             ('redundant ending without release', passage, start, 'error C1-2858-3', None, None),
             ('missing opening', passage, 'Opening from another issue', end, None,
              'opening release excerpt is missing'),
