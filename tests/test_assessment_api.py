@@ -125,6 +125,9 @@ class AssessmentAPITests(unittest.TestCase):
         end = 'Fixed in v99.2.'
         span = f'{start}. Several comments discussed the launch failure. {end}'
         passage = f'Adrenaline issue. {span} Thanks for the update.'
+        title = f'Adrenaline issue. {start}'
+        self.retrieval['sources'][0]['payload']['title'] = title
+        repeated = f'{title} Later in the report: {span}'
         cases = (
             ('matching span', passage, start, end, span, None),
             ('complete opening with redundant ending', passage, span, end, span, None),
@@ -137,6 +140,11 @@ class AssessmentAPITests(unittest.TestCase):
             ('reversed excerpts', f'{end} Earlier report: {start}.', start, end, None,
              'ending release excerpt must follow'),
             ('ambiguous opening', f'{start}. Then: {span}', start, end, None,
+             'opening release excerpt appears more than once'),
+            ('repeated opening anchored by title', repeated, start, end, repeated, None),
+            ('opening repeats after the release', f'{repeated} New report: {start}', start, end, None,
+             'opening release excerpt appears more than once'),
+            ('ambiguous title', f'{title} {repeated}', start, end, None,
              'opening release excerpt appears more than once'),
             ('ambiguous ending', f'{passage} Repeated note: {end}', start, end, None,
              'ending release excerpt appears more than once'),

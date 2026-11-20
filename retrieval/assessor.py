@@ -6,7 +6,7 @@ import math
 from retrieval.evidence import ALLOWED_SUPPORT, SUPPORT, decide_evidence, passage_hash
 
 
-PROMPT_VERSION = 'vita-evidence-v17'
+PROMPT_VERSION = 'vita-evidence-v18'
 FUNCTION_NAME = 'review_passages'
 ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 ROW_FIELDS = {'source_index', 'relevance', 'applicability', 'support', 'claim',
@@ -72,23 +72,26 @@ change, or feature. A reply confirming that the named version fixed the issue
 can establish a scoped documented_release claim. Use documented_release for that
 release answer even when the evidence is a user's report. A suggestion to try the
 version by itself does not establish a fix.
-Choose a quote that connects the reported problem to the named release. If the
-fix is established by a confirming reply, include that reply. When the reply
-or suggestion refers to "this issue" or "this bug", include the earlier text
-that identifies the problem. In the claim, name the release that fixed the
-problem. Put background versions in reason instead of claim unless needed to
-state the answer's scope, such as an explicitly requested firmware version.
-For example, if a report says Bluetooth failed on v2.1 and a later reply confirms
-it works on v2.2, the claim is "In this report, v2.2 fixed the Bluetooth issue."
-Quote from the Bluetooth report through the confirmation. Include each version
-and error code in the claim and the exact requested error code in the quote.
-Prefer one continuous verbatim quote in evidence_quote, with evidence_start
-omitted, even if the quote spans several sentences. If the supporting text is
-far apart, copy a short, unique opening excerpt where the problem is identified
-into evidence_start and a short, unique ending excerpt from the same passage
-into evidence_quote. The ending must start after the opening ends. The
-application will extract the full verbatim span between them. Leave
-evidence_start unset or empty for other support labels.
+Follow the subject of the fix statement and its confirmation. A discussion may
+switch from an install crash to a theme display issue. A release and a "works"
+reply about the theme establish nothing about the install crash. If the release
+cannot be tied to the requested problem, keep the relevant source and set
+support to none. For a valid release claim, quote the problem, release and any
+confirming reply needed to establish the fix. Include the claimed release and
+any exact error code requested or named in the claim in the quote. Keep
+background versions in reason unless they are needed to scope the answer.
+
+Use one continuous verbatim evidence_quote with evidence_start omitted when
+the supporting text is close together. For distant text, copy two verbatim
+excerpts in passage order:
+- evidence_start: the earlier excerpt that identifies the problem.
+- evidence_quote: the later excerpt containing the release and its support.
+Each excerpt must occur exactly once in this passage. If the same error phrase
+appears in the title and body, include neighboring words until the opening is
+unique. Check that the ending begins after the opening ends. Copy both exactly
+from the passage, without ellipses, spelling changes, or swapping their order.
+The application extracts the full verbatim span. If unique bounds are hard to
+find, use the full verbatim span in evidence_quote and omit evidence_start.
 A fixing commit alone, a version for a different error or product, and a version
 mentioned only as setup context do not establish the requested release.
 A release tag in a link to the file the app was trying to download describes
@@ -155,10 +158,14 @@ def _schema(source_count):
             'For release_identification, use documented_release for a named release tied to the fix, '
             'including an attributed confirmation that the named release worked.'
         )},
-        'claim': {'type': 'string'}, 'evidence_quote': {'type': 'string'},
+        'claim': {'type': 'string'},
+        'evidence_quote': {'type': 'string', 'description': (
+            'A verbatim continuous quote. When evidence_start is present, copy only the unique '
+            'ending excerpt containing the release evidence, after the opening excerpt.'
+        )},
         'evidence_start': {'type': 'string', 'description': (
-            'Omit unless support is documented_release for a release lookup. With this field, '
-            'evidence_quote is the ending excerpt from the same passage.'
+            'Omit unless support is documented_release for a release lookup. Copy the unique earlier '
+            'excerpt identifying the problem. Include nearby words if the error phrase repeats.'
         )},
         'contradicted': {'type': 'boolean'}, 'reason': {'type': 'string'},
         'limitations': {'type': 'array', 'items': {'type': 'string'}},
@@ -256,7 +263,7 @@ def _unique_object(pairs):
     return result
 
 
-def _release_quote_span(passage, start, end):
+def _release_quote_span(passage, start, end, *, title=None):
     if not start.strip() or not isinstance(end, str) or not end.strip():
         raise ValueError('Release evidence needs nonempty opening and ending excerpts.')
     start_index = passage.find(start)
@@ -265,8 +272,15 @@ def _release_quote_span(passage, start, end):
         raise ValueError('The opening release excerpt is missing from the source passage.')
     if end_index < 0:
         raise ValueError('The ending release excerpt is missing from the source passage.')
-    if passage.rfind(start) != start_index:
-        raise ValueError('The opening release excerpt appears more than once in the source passage.')
+    last_start = passage.rfind(start)
+    if last_start != start_index:
+        # Expand to the verbatim title when it uniquely anchors the first opening.
+        if (not isinstance(title, str) or not passage.startswith(title + ' ')
+                or passage.rfind(title) != 0 or title.find(start) != start_index
+                or title.rfind(start) != start_index or last_start + len(start) > end_index):
+            raise ValueError('The opening release excerpt appears more than once in the source passage.')
+        start_index = 0
+        start = title
     if passage.rfind(end) != end_index:
         raise ValueError('The ending release excerpt appears more than once in the source passage.')
     start_end = start_index + len(start)
@@ -334,7 +348,7 @@ def parse_review(retrieval, response):
                 raise ValueError('Claim and ending evidence excerpt must be strings.')
             try:
                 assessment['evidence_quote'] = _release_quote_span(
-                    payload['chunk'], evidence_start, row['evidence_quote'],
+                    payload['chunk'], evidence_start, row['evidence_quote'], title=payload.get('title'),
                 )
             except ValueError as exc:
                 release_quote_error = exc
