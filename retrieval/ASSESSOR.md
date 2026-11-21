@@ -124,5 +124,34 @@ schema/provenance checks cannot establish their semantic correctness.
 The UI now opts into `/assess` explicitly. It shows supported scoped claims and
 quotes rather than calling another model to write a troubleshooting answer.
 Independent label review, broader retrieval/intent coverage, citation reachability
-and complete v1 quality acceptance remain open. Current prompt is
-`vita-evidence-v4`; historical v3 results above are not evidence for v4.
+and complete v1 quality acceptance remain open. This run used `vita-evidence-v4`.
+
+## 21 November release regression retest
+
+The retest used the source tree merged in `55f2f5c`, prompt `vita-evidence-v18`,
+the existing 1,037-point `vita_docs` collection, and the configured free
+Nemotron reviewer. All 64 offline tests passed. All eight live regressions
+matched their expected decision, each expected source ranked first, and the
+provider reported zero cost for all eight requests.
+
+To repeat the checks, start the [local API](../api/README.md), then send each
+question as `{"question": "…", "limit": 5}` to `/search` and `/assess`.
+Check that both routes return the same source points and that the expected source
+appears in the results. A cited result should return `supported_answer` and a
+claim backed by a quote from the expected source. A withheld result should return
+`related_reports_insufficient_support` with zero permitted claims.
+
+| Question | Expected result | Expected source |
+| --- | --- | --- |
+| Which VitaShell release was reuploaded with old libftpvita and then confirmed to work with WinSCP after the 0.9 FTP connection failure? | Cited VitaShell 0.9 reupload | [VitaShell #34](https://github.com/TheOfficialFloW/VitaShell/issues/34) |
+| VitaShell 1.71 asked for an SD card when mounting PSVSD as a USB device. Which installable release did the reporter confirm worked? | Cited VitaShell 1.72 confirmation | [VitaShell #275](https://github.com/TheOfficialFloW/VitaShell/issues/275) |
+| Which released version of PKGj does the issue document as fixing the failed to rename error 0x80010016 when downloading a non-Vita game? | Cited PKGj 0.57 fix for that error | [PKGj #414](https://github.com/blastrock/pkgj/issues/414) |
+| Which already released PKGj version does the issue confirm fixed 'failed to seek for resume' after an interrupted download? | Withheld. The release was planned. | [PKGj #129](https://github.com/blastrock/pkgj/issues/129) |
+| Which released VitaShell version did the report confirm fixed intermittent GPU crashes while opening files, including reports of crashes on 1.9? | Withheld. The version was suggested. | [VitaShell #397](https://github.com/TheOfficialFloW/VitaShell/issues/397) |
+| VitaShell 1.5 froze before the unsafe prompt when installing a new VPK. Which installable VitaShell release does the issue confirm fixed this specific freeze? | Withheld. The release mention concerns a different symptom. | [VitaShell #181](https://github.com/TheOfficialFloW/VitaShell/issues/181) |
+| Did the original PKGj v0.52 rest-mode download reporter say updating iTLS-Enso made their paused background downloads resume? | Withheld. The reporter described spontaneous recovery. | [PKGj #317](https://github.com/blastrock/pkgj/issues/317) |
+| VitaShell 1.97 on firmware 3.63 crashed opening the triangle menu to refresh LiveArea after a NoNpDrm install. Did the reporter say switching to firmware 3.65 helped? | Cited the reporter's firmware 3.65 outcome | [VitaShell #502](https://github.com/TheOfficialFloW/VitaShell/issues/502) |
+
+The retest reused the 20 November regression questions. The results measure
+repeatability on those cases. Independent held-back evaluation remains part of
+the v1 release checks.
