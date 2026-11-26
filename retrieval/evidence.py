@@ -40,6 +40,11 @@ SPONTANEOUS_RECOVERY = re.compile(
     r'(?:(?:fixed|resolved|corrected)\s+itself'
     r'|(?:went away|cleared up|resumed|started working)\s+on its own)\b', re.I,
 )
+NO_IMPROVEMENT = re.compile(
+    r"\b(?:make (?:a|any) difference\s*,?\s+and it (?:didn['’]t|did not)"
+    r"|(?:didn['’]t|did not) make (?:a|any) difference"
+    r"|made no difference)\b", re.I,
+)
 WITHDRAWN_OUTCOME = re.compile(r'\b(?:withdraw|withdrawn|retract|retracted)\b|\bproblem\s+persists\b|\b(?:crashed|failed)\s+again\b', re.I)
 
 
@@ -170,7 +175,10 @@ def decide_evidence(retrieval, review):
                     raise ValueError('A tentative prediction in a success quote requires review; it is not an observed outcome.')
                 if not assessment['contradicted'] and WITHDRAWN_OUTCOME.search(quote):
                     raise ValueError('A withdrawn or recurring outcome cannot be labeled uncontradicted success.')
-                if any(match['negation'] is None for match in SPONTANEOUS_RECOVERY.finditer(quote)):
+                if NO_IMPROVEMENT.search(quote):
+                    support = 'symptoms_only'
+                    reason = 'The quote reports an attempt that made no difference.'
+                elif any(match['negation'] is None for match in SPONTANEOUS_RECOVERY.finditer(quote)):
                     support = 'symptoms_only'
                     reason = 'The quoted recovery was reported as spontaneous.'
             if relevance == 'irrelevant':
