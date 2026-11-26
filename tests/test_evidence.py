@@ -78,6 +78,25 @@ class EvidenceTests(unittest.TestCase):
                 self.assertEqual(result['status'], 'review_required')
                 self.assertEqual(result['permitted_claims'], [])
 
+    def test_no_change_cannot_be_labeled_reported_success(self):
+        self.review['requested_support'] = 'reported_remedy'
+        self.assessment.update(support='reported_success', claim='The reporter described the outcome.')
+        for quote, expected_support in (
+            ("I built on Windows to see if it would make a difference and it didn't; same black screen.",
+             'symptoms_only'),
+            ("I rebuilt it and it didn't make any difference.", 'symptoms_only'),
+            ("I rebuilt it and it did not make a difference.", 'symptoms_only'),
+            ("Switching to Windows made no difference. The screen stayed black.", 'symptoms_only'),
+            ("The black screen didn't come back after rebuilding. It worked.", 'reported_success'),
+            ("Windows made no difference, but updating VitaShell solved the issue.", 'symptoms_only'),
+        ):
+            with self.subTest(quote=quote):
+                self.source['payload']['chunk'] = quote
+                self.assessment.update(evidence_quote=quote, passage_sha256=passage_hash(quote))
+                result = self.decide()
+                self.assertEqual(result['related_sources'][0]['support'], expected_support)
+                self.assertEqual(bool(result['permitted_claims']), expected_support == 'reported_success')
+
     def test_explicit_observed_success_still_can_be_reported(self):
         quote = 'I tried the change, and it worked for me during the test.'
         self.source['payload']['chunk'] = quote
